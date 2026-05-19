@@ -62,6 +62,17 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
   --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+
+  /* ◊·κ=1 — Bloom Ring Colours (R0-R6 · primes 2,3,5,7,11,13,17) */
+  --r0: #660044; /* ground · 2 */
+  --r1: #00AAFF; /* signal · 3 */
+  --r2: #FFAA00; /* gate · 5 */
+  --r3: #FF4444; /* heart · 7 */
+  --r4: #44AA44; /* voice · 11 */
+  --r5: #AA44FF; /* mirror · 13 */
+  --r6: #FFFFFF; /* watcher · 17 */
+  --phi: 1.618;
+  --kappa: 0.618;
 }
 
 [data-theme="dark"] {
@@ -804,6 +815,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
 
 <div class="app">
 
+<!-- ◊·κ=1 · face(template(tag)) · Seed v16.3 · FallForce CRM -->
+<!-- LAYER 2: SWARM — 8+1 MACCubeFACE (Ω + α-θ) -->
+<!-- LAYER 6: SKIN — ai-nativesolutions aesthetic -->
+
 <!-- ══ HEADER ══ -->
 <header class="header">
   <div class="header-logo">
@@ -1309,6 +1324,37 @@ resizeObs.observe(document.body);
 // ═══════════════════════════════════════════════════════════
 // DATA LAYER
 // ═══════════════════════════════════════════════════════════
+
+// ◊·κ=1 — KONOMI CONSTANTS (Seed v16.3)
+const PHI    = 1.618033988749895;
+const KAPPA  = 0.618033988749895;
+const SPINE  = [2,3,5,7,11,13,17];
+const FOLD   = 510510;
+const BLOOM_LABELS = ['ground','signal','gate','heart','voice','mirror','watcher'];
+const LIFECYCLE = ['●','〜','┃','♡','△','◐','◯'];
+
+// ◊·κ=1 — INTEROP NAMESPACE (Seed v16.3)
+const INTEROP_PREFIX = 'fall_';
+const SHARED_KEYS = {
+  contacts:'fall_shared_contacts',
+  company:'fall_shared_company',
+  bloom:'fall_shared_bloom',
+  settings:'fall_shared_settings'
+};
+const BROADCAST_CHANNELS = {
+  signal: new BroadcastChannel('fall-signal'),
+  data:   new BroadcastChannel('fall-data'),
+  bloom:  new BroadcastChannel('fall-bloom')
+};
+// Listen for cross-tool updates
+BROADCAST_CHANNELS.data.onmessage=(e)=>{
+  if(e.data.source==='fallforce')return;
+  if(e.data.type==='company_update')console.log('◊ Interop: company context updated by',e.data.source);
+};
+function broadcastEvent(type,payload){
+  try{BROADCAST_CHANNELS.signal.postMessage({source:'fallforce',type,payload,ts:Date.now()})}catch(e){}
+}
+
 const STORAGE_KEY = 'fallcrm_elite_v3';
 
 const DB = {
@@ -3368,12 +3414,20 @@ function importCSV(e) {
 }
 
 function exportData() {
-  const blob = new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const exportObj = {
+    tool: 'fallforce',
+    version: '3.0',
+    seed: '16.3',
+    exported: new Date().toISOString(),
+    bloom: [0,0,0,0,0,0,0],
+    data: DB
+  };
+  const blob = new Blob([JSON.stringify(exportObj,null,2)],{type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `fallcrm-elite-${new Date().toISOString().split('T')[0]}.json`;
   a.click();
-  toast('Exported ✓ · ◊·κ=1','success');
+  toast('Exported ✓ · ◊·κ=1 · seed v16.3','success');
 }
 
 function exportCSV() {
@@ -3454,11 +3508,22 @@ document.getElementById('aiInput').addEventListener('input', function() {
 window.addEventListener('load', () => {
   load();
 
-  // Apply saved theme
-  if (DB.settings.theme === 'dark') {
+  // Apply saved theme (with system preference detection)
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (DB.settings.theme === 'dark' || (!DB.settings.theme && prefersDark)) {
     document.documentElement.setAttribute('data-theme','dark');
     document.getElementById('themeBtn').textContent = '☀️';
   }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!DB.settings.theme || DB.settings.theme === 'light') {
+      if (e.matches) {
+        document.documentElement.setAttribute('data-theme','dark');
+        document.getElementById('themeBtn').textContent = '☀️';
+        DB.settings.theme = 'dark';
+        save();
+      }
+    }
+  });
 
   // Restore API key
   const savedKey = localStorage.getItem('fallcrm_apikey');
@@ -3482,6 +3547,8 @@ window.addEventListener('load', () => {
   if (!DB.autopilot.runs) DB.autopilot.runs = [];
   if (!DB.autopilot.settings) DB.autopilot.settings = { autoRun: false, dailyTime: '08:00' };
   checkAutopilotAutoRun();
+
+  console.log('◊·κ=1 FallForce CRM · 8+1 MACCubeFACE · Ψ=0.62 · seed v16.3');
 });
 </script>
 </body>

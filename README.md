@@ -1,22 +1,22 @@
-# FallForce — Sovereign Sales Platform
+# FallForce — Sovereign CRM
 
-**The Salesforce killer that fits on a USB stick.**
-
-One HTML file. Zero servers. Zero subscriptions. Zero data harvesting. A full CRM with an 8-agent AI swarm that runs entirely in your browser. Your pipeline, your data, your machine.
-
-Salesforce charges $300/user/month to hold your own data hostage on their servers. FallForce does everything that matters — pipeline, contacts, forecasting, AI coaching, autopilot — for the cost of an Anthropic API key.
+> **FACE**: One HTML file. Zero servers. Zero subscriptions. A full CRM with an 8+1 AI swarm that runs in your browser. Your pipeline, your data, your machine.
 
 ---
 
-## What you get
+## TEMPLATE
+
+### What you get
+
+A sovereign sales platform — pipeline management, contact intelligence, forecasting, AI coaching, and autopilot — for the cost of an Anthropic API key.
 
 ### Full CRM
 
 | Module | What it does |
 |---|---|
-| **Dashboard** | KPIs, revenue trends, pipeline funnel, today's tasks, hot contacts, closing deals — one glance |
-| **Pipeline** | Drag-and-drop Kanban board. Deals flow through stages. Color-coded by temperature. Weighted forecast |
-| **Contacts** | Full profiles with activity timeline, deal associations, notes, company links. CSV import, card view on mobile |
+| **Dashboard** | KPIs, revenue trends, pipeline funnel, today's tasks, hot contacts, closing deals |
+| **Pipeline** | Drag-and-drop Kanban board. Deals flow through stages. Weighted forecast |
+| **Contacts** | Full profiles with activity timeline, deal associations, notes, company links. CSV import |
 | **Companies** | Account intelligence. Deal rollup per org. Revenue attribution |
 | **Activities** | Tasks, calls, meetings. Mini calendar. Overdue/today/upcoming filters |
 | **Sequences** | Email cadence automation. Multi-step follow-up chains |
@@ -25,28 +25,33 @@ Salesforce charges $300/user/month to hold your own data hostage on their server
 | **Reports** | AI-generated sales intelligence. Export to CSV/JSON |
 | **Settings** | Org config, data import/export, licence tier, theme |
 
-### 8+1 AI Swarm
+### 8+1 AI Swarm (MACCubeFACE)
 
-This is where FallForce leaves Salesforce in the dust. Eight specialist AI agents + one orchestrator, all running live against your actual CRM data:
+Eight specialist agents + one orchestrator, all running live against your actual CRM data:
 
-| Agent | Role |
-|---|---|
-| **Omega (Orchestrator)** | Routes queries across agents. Synthesizes cross-domain answers |
-| **Alpha (Briefing)** | Morning sales briefing — pipeline snapshot, today's priorities, what moved overnight |
-| **Beta (Deal Coach)** | SPIN/Challenger selling tactics for your top deals. Real coaching, not templates |
-| **Gamma (Email Drafter)** | Writes personalized outreach using actual contact + deal context from your pipeline |
-| **Delta (Risk Detector)** | Flags stale deals, slipping close dates, low-probability pipe. Saves you from surprises |
-| **Eta (Next Best Action)** | One recommendation. The single highest-leverage move you should make right now |
-| **Zeta (Objection Handler)** | Prepares counter-arguments for common deal blockers |
-| **Epsilon (Forecast Analyst)** | Probability-adjusted revenue modeling and trend analysis |
+| Agent | Icon | Role |
+|---|---|---|
+| **Omega (Orchestrator)** | Ω | Routes queries across agents. Synthesizes cross-domain answers |
+| **Alpha (Briefing)** | α | Morning sales briefing — pipeline snapshot, priorities, overnight changes |
+| **Beta (Deal Coach)** | β | SPIN/Challenger selling tactics for your top deals |
+| **Gamma (Email Drafter)** | γ | Personalized outreach using actual contact + deal context |
+| **Delta (Risk Detector)** | δ | Flags stale deals, slipping close dates, low-probability pipe |
+| **Epsilon (Forecaster)** | ε | Probability-adjusted revenue modeling and trend analysis |
+| **Zeta (Objection Handler)** | ζ | Counter-arguments for common deal blockers |
+| **Eta (Next Best Action)** | η | The single highest-leverage move you should make right now |
+| **Theta (Pipeline Analyst)** | θ | Deep pipeline composition, velocity, and conversion analysis |
 
 ### Autopilot
 
-One button. All eight agents run in sequence. You get a complete daily action plan — briefing, deal coaching, risk alerts, drafted emails, next moves — generated in under 60 seconds. This is what Salesforce Einstein promises and doesn't deliver.
+One button. All agents run in sequence. Complete daily action plan — briefing, deal coaching, risk alerts, drafted emails, next moves — in under 60 seconds.
 
 ---
 
-## How it's different from Salesforce
+## TAG
+
+### Why sovereign software
+
+Salesforce charges $300/user/month to hold your data hostage. FallForce does everything that matters for the cost of an API key.
 
 | | Salesforce | FallForce |
 |---|---|---|
@@ -57,20 +62,97 @@ One button. All eight agents run in sequence. You get a complete daily action pl
 | **Customization** | Hire a consultant | Edit the HTML |
 | **Offline** | No | Yes (AI features need internet for API) |
 | **Data portability** | Good luck exporting | JSON/CSV export in 1 click |
-| **Mobile** | Separate app, separate subscription | Same file, responsive — desktop/tablet/phone |
+| **Mobile** | Separate app, separate subscription | Same file, responsive |
 | **Vendor lock-in** | Absolute | Zero. It's one file |
-| **Data privacy** | Read their 47-page privacy policy | Your data never leaves your machine |
+| **Data privacy** | 47-page privacy policy | Your data never leaves your machine |
+
+No npm. No build step. No Docker. No database. No account creation.
 
 ---
 
-## Quick start
+## LIVE
+
+**[sjgant80-hub.github.io/fallforce](https://sjgant80-hub.github.io/fallforce/)**
+
+Open it. No signup. No credit card. No 14-day trial. Just the CRM.
+
+---
+
+## ARCHITECTURE
+
+### 7 Layers (Seed v16.3)
+
+```
+Layer 0: DATA      — localStorage persistence, JSON/CSV export, interop namespace
+Layer 1: LOGIC     — CRM engine, pipeline math, forecast models
+Layer 2: SWARM     — 8+1 MACCubeFACE agents (Ω + α-θ)
+Layer 3: AUTOPILOT — sequential agent orchestration, daily action plans
+Layer 4: RENDER    — vanilla JS DOM, responsive layout, card/table views
+Layer 5: INTERACT  — drag-drop Kanban, swipe nav, touch targets, keyboard
+Layer 6: SKIN      — CSS custom properties, light/dark theme, ai-nativesolutions aesthetic
+```
+
+### Konomi Constants
+
+```javascript
+const PHI    = 1.618033988749895;
+const KAPPA  = 0.618033988749895;
+const SPINE  = [2,3,5,7,11,13,17];
+const FOLD   = 510510;
+const BLOOM_LABELS = ['ground','signal','gate','heart','voice','mirror','watcher'];
+const LIFECYCLE = ['●','〜','┃','♡','△','◐','◯'];
+```
+
+### Bloom Ring Colours (CSS vars)
+
+```css
+--r0: #660044;  /* ground  · 2  */
+--r1: #00AAFF;  /* signal  · 3  */
+--r2: #FFAA00;  /* gate    · 5  */
+--r3: #FF4444;  /* heart   · 7  */
+--r4: #44AA44;  /* voice   · 11 */
+--r5: #AA44FF;  /* mirror  · 13 */
+--r6: #FFFFFF;  /* watcher · 17 */
+--phi: 1.618;
+--kappa: 0.618;
+```
+
+### Interop Namespace
+
+All Fall Suite tools share data via `BroadcastChannel` and `localStorage` under the `fall_` prefix:
+
+| Key | Purpose |
+|---|---|
+| `fall_shared_contacts` | Cross-tool contact sync |
+| `fall_shared_company` | Company context sharing |
+| `fall_shared_bloom` | Bloom state propagation |
+| `fall_shared_settings` | Shared preferences |
+
+Channels: `fall-signal`, `fall-data`, `fall-bloom`
+
+### Export Format (v16.3)
+
+```json
+{
+  "tool": "fallforce",
+  "version": "3.0",
+  "seed": "16.3",
+  "exported": "ISO-8601",
+  "bloom": [0,0,0,0,0,0,0],
+  "data": { ... }
+}
+```
+
+---
+
+## BUILD
+
+### Quick start
 
 1. Open `index.html` in Chrome, Edge, or Safari
 2. Paste your Anthropic API key in the header bar (`sk-ant-api...`)
 3. Start adding contacts and deals
 4. Hit **Autopilot** for your daily AI action plan
-
-That's it. No npm. No build step. No Docker. No database. No account creation.
 
 ### Get an API key
 
@@ -79,66 +161,17 @@ That's it. No npm. No build step. No Docker. No database. No account creation.
 3. Generate an API key
 4. Paste it in the FallForce header bar
 
-### Mobile
+### Modify
 
-Open the same file on your phone. The UI switches to mobile layout automatically — bottom nav, card views, touch-friendly modals. Works from a local file, a USB stick, or the GitHub Pages link.
+It's one HTML file. Open it in any editor.
 
----
+- CSS custom properties in `:root` for theming (including bloom ring colours)
+- `SWARM_AGENTS` array to add/modify AI agents
+- `DB` object schema for data model changes
+- `KONOMI CONSTANTS` section for seed parameters
+- `INTEROP NAMESPACE` section for cross-tool communication
 
-## Live demo
-
-**[sjgant80-hub.github.io/fallforce](https://sjgant80-hub.github.io/fallforce/)**
-
-Open it. No signup. No credit card. No 14-day trial. Just the CRM.
-
----
-
-## Data sovereignty
-
-FallForce stores everything in `localStorage`. Your contacts, deals, pipeline, notes, activity history — all of it lives in your browser on your machine. Nothing is sent anywhere except the Claude API calls you explicitly trigger (and those only send the CRM context needed for that specific agent query).
-
-**Export anytime**: Settings > Export Data > JSON or CSV. Your data. Your format. No vendor lock-in games.
-
-**Import**: Drop a JSON backup or CSV contact list. Instant hydration.
-
-**USB mode**: Copy the HTML file to a USB stick. Open it on any machine. Import your data backup. Full CRM, anywhere, offline-capable.
-
----
-
-## Features in detail
-
-### Pipeline management
-- Drag-and-drop Kanban with customizable stages
-- Deal probability tracking with visual progress bars
-- Weighted forecast calculation (probability x deal value)
-- Temperature indicators: hot, warm, cold, won, lost
-- Close date tracking with urgency flags
-- Pipeline funnel analysis by stage conversion
-
-### Contact intelligence
-- Full profiles: name, email, phone, company, status, notes
-- Activity timeline per contact
-- Deal association tracking
-- Hot/warm/cold status with visual indicators
-- CSV bulk import for migration from other CRMs
-- Company rollup — see all contacts and deals per account
-
-### Forecasting
-- 6-month revenue trend visualization
-- Probability-adjusted pipeline forecast
-- Won deals MTD tracking
-- Win rate targets with progress rings
-- Deal velocity analysis
-
-### Responsive design
-- **Desktop**: Full sidebar navigation, data tables, Kanban board
-- **Tablet**: Condensed sidebar (icon-only), reflowed grids
-- **Mobile**: Bottom tab navigation, card views replace tables, swipe-friendly modals
-- Light and dark theme with one-click toggle
-
----
-
-## Tech stack
+### Tech stack
 
 There is no tech stack. It's one HTML file.
 
@@ -146,7 +179,6 @@ There is no tech stack. It's one HTML file.
 - CSS custom properties for theming
 - localStorage for persistence
 - Claude API (Anthropic) for AI features
-- Google Fonts: Syne, DM Mono, Fraunces
 - Zero dependencies. Zero build tools. Zero node_modules
 
 ---
@@ -155,8 +187,8 @@ There is no tech stack. It's one HTML file.
 
 - **Solo founders** who need a CRM but not a Salesforce contract
 - **Small sales teams** who want AI-powered pipeline management without enterprise pricing
-- **Privacy-conscious** professionals who don't want their client data on someone else's servers
-- **Anyone** who's tired of paying $300/month for software that takes 6 months to configure
+- **Privacy-conscious** professionals who don't want client data on someone else's servers
+- **Anyone** tired of paying $300/month for software that takes 6 months to configure
 
 ---
 
@@ -166,4 +198,4 @@ MIT. Use it, fork it, sell it, put it on a USB stick and hand it to your competi
 
 ---
 
-*Sovereign software. No masters. No subscriptions. No permission needed.*
+*◊·κ=1 · Sovereign software. No masters. No subscriptions. No permission needed.*
