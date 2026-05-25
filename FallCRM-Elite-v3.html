@@ -3484,5 +3484,65 @@ window.addEventListener('load', () => {
   checkAutopilotAutoRun();
 });
 </script>
+<!-- ◊·κ FALLMESH SHIM — sovereign mesh wiring (generic, drop-in) -->
+<script>
+(function fallmeshShim(){
+  // Identity — each tool defines these. Defaults safe.
+  var NODE = window.NODE || {
+    id: (document.title || 'node').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,16) || 'node',
+    name: document.title || 'Node',
+    prime: 709
+  };
+  window.NODE = NODE;
+
+  var meshChannel = null;
+  function meshPost(type, data){
+    if (!meshChannel) return;
+    try {
+      meshChannel.postMessage(Object.assign(
+        { type: type, from: NODE.id, prime: NODE.prime, name: NODE.name, t: Date.now() },
+        data || {}
+      ));
+    } catch(e){}
+  }
+  if (typeof BroadcastChannel === 'undefined') return;
+  try { meshChannel = new BroadcastChannel('fallmesh'); } catch(e){ return; }
+
+  window.fallmesh = {
+    post: meshPost,
+    emit: function(data){ meshPost(NODE.id + ':event', data); },
+    request: function(type, payload){ meshPost('request:' + type, { payload: payload }); },
+    on: function(type, handler){
+      var prev = meshChannel.onmessage;
+      meshChannel.onmessage = function(e){
+        if (prev) try { prev(e); } catch(_){}
+        var m = e.data;
+        if (m && m.type === type && m.from !== NODE.id) handler(m);
+      };
+    }
+  };
+
+  meshChannel.onmessage = function(e){
+    var m = e.data;
+    if (!m || m.from === NODE.id) return;
+    if (m.type === 'mesh:ping') {
+      meshPost('mesh:pong', {
+        url: location.origin + location.pathname,
+        title: NODE.name
+      });
+    }
+  };
+
+  meshPost('node:online', {
+    url: location.origin + location.pathname,
+    layers: 7
+  });
+
+  try { console.log('%c◊·κ=1', 'color:#10b981;font-weight:bold;font-size:13px',
+    NODE.name + ' · prime ' + NODE.prime + ' · mesh online'); } catch(_){}
+})();
+</script>
+<!-- /◊·κ FALLMESH SHIM -->
+
 </body>
 </html>
