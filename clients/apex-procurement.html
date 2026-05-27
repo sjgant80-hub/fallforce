@@ -1810,12 +1810,77 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
     };
 
     // ════════════════════════════════════════════════════════════════
-    // ◊·κ P4 · Procurement quick-action bar · always visible in top toolbar
+    // ◊·κ P4 · Procurement quick-action bar · DRAGGABLE · position persists
     // ════════════════════════════════════════════════════════════════
+    function makeApexBarDraggable(el) {
+      if (el._draggable) return;
+      el._draggable = true;
+      // Add a drag handle at the start
+      var handle = document.createElement('span');
+      handle.textContent = '⋮⋮';
+      handle.title = 'drag to move';
+      handle.style.cssText = 'cursor:move;user-select:none;padding:0 6px;color:#5a5a5a;font-size:14px;letter-spacing:-2px;display:inline-flex;align-items:center;border-right:1px solid rgba(255,255,255,0.08);margin-right:4px';
+      el.insertBefore(handle, el.firstChild);
+      // Restore saved position
+      try {
+        var saved = JSON.parse(localStorage.getItem('apex_bar_pos') || 'null');
+        if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+          el.style.left = saved.left + 'px';
+          el.style.top  = saved.top  + 'px';
+          el.style.right = 'auto';
+          el.style.bottom = 'auto';
+        }
+      } catch(_){}
+      var ox = 0, oy = 0, dragging = false;
+      function start(e) {
+        if (e.target !== handle && !handle.contains(e.target)) return;
+        var r = el.getBoundingClientRect();
+        var clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+        var clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
+        ox = clientX - r.left;
+        oy = clientY - r.top;
+        dragging = true;
+        e.preventDefault();
+      }
+      function move(e) {
+        if (!dragging) return;
+        var clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+        var clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
+        if (clientX === undefined) return;
+        var nl = Math.max(0, Math.min(window.innerWidth  - 60, clientX - ox));
+        var nt = Math.max(0, Math.min(window.innerHeight - 30, clientY - oy));
+        el.style.left  = nl + 'px';
+        el.style.top   = nt + 'px';
+        el.style.right = 'auto';
+        el.style.bottom = 'auto';
+      }
+      function end() {
+        if (!dragging) return;
+        dragging = false;
+        try {
+          localStorage.setItem('apex_bar_pos', JSON.stringify({
+            left: parseInt(el.style.left, 10) || 0,
+            top:  parseInt(el.style.top,  10) || 0
+          }));
+        } catch(_){}
+      }
+      handle.addEventListener('mousedown', start);
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', end);
+      handle.addEventListener('touchstart', start, { passive: false });
+      document.addEventListener('touchmove', move, { passive: false });
+      document.addEventListener('touchend', end);
+      // Double-click handle to reset to top-right default
+      handle.addEventListener('dblclick', function(){
+        el.style.top = '14px'; el.style.right = '14px'; el.style.left = 'auto'; el.style.bottom = 'auto';
+        try { localStorage.removeItem('apex_bar_pos'); } catch(_){}
+      });
+    }
+
     setTimeout(function(){
       var bar = document.createElement('div');
       bar.id = 'apex-procurement-bar';
-      bar.style.cssText = 'position:fixed;top:14px;right:14px;z-index:9000;display:flex;gap:6px;background:rgba(20,22,30,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,0.4);';
+      bar.style.cssText = 'position:fixed;top:14px;right:14px;z-index:9000;display:flex;gap:6px;background:rgba(20,22,30,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,0.4);align-items:center';
       bar.innerHTML =
         '<button onclick="showPage(\'reviewers\')" style="background:rgba(212,175,55,0.15);color:#d4af37;border:1px solid rgba(212,175,55,0.4);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">Open RFQs</button>' +
         '<button onclick="showPage(\'escalation\')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">Escalations</button>' +
@@ -1825,6 +1890,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
         '<button onclick="window.apexSync.configureEndpoint()" title="Configure your self-hosted sync URL (POST/GET /sync/:teamId)" style="background:rgba(120,130,140,0.15);color:#aab1ba;border:1px solid rgba(120,130,140,0.3);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">⇋ Sync</button>' +
         '<button onclick="window.apexDevMode.toggle()" title="Toggle developer view (show/hide KCC + bloom)" style="background:rgba(120,130,140,0.1);color:#5a5a5a;border:1px solid rgba(120,130,140,0.2);padding:5px 8px;border-radius:5px;cursor:pointer;font-size:10px">dev</button>';
       document.body.appendChild(bar);
+      makeApexBarDraggable(bar);
     }, 500);
 
     // 5. Render Escalation Tree
