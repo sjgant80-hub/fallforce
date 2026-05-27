@@ -1286,15 +1286,20 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
   body.workflow-governance.procurement-mode .nav-label.crm-only { display: none; }
   body.workflow-governance.procurement-mode #nav-pipeline .nav-text::after { content: ' (RFQ)'; opacity: 0.6; font-size: 10px; }
 
-  /* ◊·κ P6 · hide any KCC-visible elements on procurement surface */
+  /* ◊·κ P6 · hide ALL KCC/KONO/bloom-visible elements on procurement surface */
   body.workflow-governance.procurement-mode .kcc-visible,
   body.workflow-governance.procurement-mode #sidebarBloom,
-  body.workflow-governance.procurement-mode .bloom-footer {
+  body.workflow-governance.procurement-mode .bloom-footer,
+  body.workflow-governance.procurement-mode #kcc-badge,
+  body.workflow-governance.procurement-mode #bloomId,
+  body.workflow-governance.procurement-mode #kcc-ledger-modal {
     display: none !important;
   }
   body.workflow-governance.procurement-mode.dev-mode .kcc-visible,
   body.workflow-governance.procurement-mode.dev-mode #sidebarBloom,
-  body.workflow-governance.procurement-mode.dev-mode .bloom-footer {
+  body.workflow-governance.procurement-mode.dev-mode .bloom-footer,
+  body.workflow-governance.procurement-mode.dev-mode #kcc-badge,
+  body.workflow-governance.procurement-mode.dev-mode #bloomId {
     display: revert !important;
   }
 
@@ -1691,6 +1696,25 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
     document.body.classList.add('procurement-mode');
     // Restore dev mode preference (shows KCC etc.)
     try { if (localStorage.getItem('apex_dev_mode') === '1') document.body.classList.add('dev-mode'); } catch(_){}
+
+    // ◊·κ P6 belt-and-braces · KCC badge gets injected by the KCC shim
+    // AFTER our overlay runs · hide it actively via JS in case CSS misses
+    function killKccVisuals() {
+      if (document.body.classList.contains('dev-mode')) return;
+      ['kcc-badge','bloomId','sidebarBloom'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      document.querySelectorAll('.bloom-footer').forEach(function(el){ el.style.display = 'none'; });
+    }
+    // Run periodically (and on DOM mutations) since the KCC shim may inject late
+    var killTries = 0;
+    var killIv = setInterval(function(){ killKccVisuals(); if (++killTries > 30) clearInterval(killIv); }, 500);
+    if (window.MutationObserver) {
+      var mo = new MutationObserver(function(){ killKccVisuals(); });
+      mo.observe(document.body, { childList: true, subtree: false });
+    }
+    window._killKccVisuals = killKccVisuals;
 
     // Pipeline page subtitle becomes RFQ-native + dashboard greeting changes
     setTimeout(function(){
