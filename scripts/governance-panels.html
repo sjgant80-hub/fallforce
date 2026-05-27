@@ -188,7 +188,7 @@
           '<td><strong>'+esc(d.name)+'</strong><div style="font-size:11px;color:var(--muted)">'+esc(d.company)+' · £'+(d.value||0).toLocaleString()+'</div></td>' +
           '<td>'+stageTag+'</td>' +
           '<td><div class="reviewer-bar">'+chips+'</div></td>' +
-          '<td><div class="rev-actions"><button class="rev-btn approve" onclick="window.gov.approveAll(\''+d.id+'\')">approve all</button><button class="rev-btn flag" onclick="window.gov.escalate(\''+d.id+'\')">escalate</button></div></td>' +
+          '<td><div class="rev-actions"><button class="rev-btn approve" onclick="window.gov.approveAll(\''+d.id+'\')">approve all</button><button class="rev-btn flag" onclick="window.gov.escalate(\''+d.id+'\')">escalate</button><button class="rev-btn" title="Ask AI for a recommendation (uses cascade)" onclick="window.gov.askAI(\''+d.id+'\')">🧠 ask AI</button></div></td>' +
         '</tr>';
       }).join('');
       document.getElementById('rev-table-wrap').innerHTML =
@@ -319,6 +319,42 @@
         logAudit('procurement-lead', 'Resolved escalation · ' + (note || ''), e.title, 'note');
         persist();
         renderEscalation(); renderAudit();
+      },
+      askAI: async function(dealId) {
+        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || null);
+        if (!deal) return alert('deal not found');
+        if (!window.llm) return alert('LLM cascade not loaded');
+        var sign = window.DB.signoffs[dealId] || {};
+        var signSummary = window.DB.reviewers.map(function(r){ return r.short + ':' + (sign[r.id] || 'pending'); }).join(' · ');
+        var recent = (window.DB.audit_log || []).filter(function(e){ return e.deal === deal.name; }).slice(0, 6).map(function(e){ return '- ' + e.actor + ': ' + e.message + ' [' + e.kind + ']'; }).join('\n');
+        var system = 'You are a senior procurement-compliance analyst. Be concise, decisive, and structured. Cite specific reviewer feedback and rules. Suggest the next concrete action.';
+        var prompt = 'RFQ: ' + deal.name + '\nSupplier/company: ' + deal.company + '\nValue: £' + (deal.value||0).toLocaleString() + '\nStage: ' + deal.stage + '\nClose date: ' + (deal.closeDate||'unknown') + '\nNotes: ' + (deal.notes||'') + '\n\nReviewer sign-offs: ' + signSummary + '\n\nRecent audit events:\n' + (recent || '(none)') + '\n\nWhat should the procurement lead do next? Reply in 4 lines max: 1) verdict, 2) primary risk, 3) next action, 4) which rule applies (if any).';
+        // Modal scaffold
+        var modal = document.createElement('div');
+        modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,sans-serif';
+        modal.innerHTML='<div style="background:#161821;border:1px solid #2a2f3a;border-radius:12px;padding:22px;max-width:560px;width:100%;color:#dbe1ea;max-height:88vh;overflow:auto"><h3 style="margin:0 0 4px">🧠 Ask AI · ' + esc(deal.name) + '</h3><p style="margin:0 0 12px;font-size:12px;color:#8a8a8a">Cascade tier: <span id="ai-tier">checking…</span></p><div id="ai-output" style="background:#0c0e12;border:1px solid #2a2f3a;border-radius:6px;padding:12px;font-size:13px;color:#dbe1ea;white-space:pre-wrap;min-height:80px;font-family:\'DM Mono\',monospace">thinking…</div><div style="display:flex;gap:8px;margin-top:12px"><button id="ai-anchor" style="background:#f7931a;color:#fff;border:none;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600" disabled>⚓ anchor recommendation to BSV</button><button id="ai-close" style="background:transparent;color:#8a8a8a;border:1px solid #2a2f3a;padding:7px 12px;border-radius:6px;cursor:pointer">close</button></div></div>';
+        document.body.appendChild(modal);
+        modal.querySelector('#ai-close').onclick = function(){ modal.remove(); };
+        modal.onclick = function(e){ if (e.target===modal) modal.remove(); };
+        // Hit the cascade
+        modal.querySelector('#ai-tier').textContent = window.llm.tier();
+        var r = await window.llm.ask(prompt, { system: system, max_tokens: 400, temperature: 0.4 });
+        var out = modal.querySelector('#ai-output');
+        if (r.error) {
+          out.textContent = '✗ ' + r.error + '\n\nSkipped:\n' + (r.skipped || []).map(function(s){ return '  ' + s.name + ' → ' + s.reason; }).join('\n');
+          return;
+        }
+        out.textContent = r.text;
+        modal.querySelector('#ai-tier').textContent = r.tier + ' · ' + r.provider + ' · ' + r.ms + 'ms';
+        // Log it to audit
+        logAudit('AI · ' + (r.provider || 'cascade'), 'recommendation: ' + r.text.slice(0, 120), deal.name, 'note');
+        var anchorBtn = modal.querySelector('#ai-anchor');
+        anchorBtn.disabled = false;
+        anchorBtn.onclick = async function(){
+          anchorBtn.disabled = true; anchorBtn.textContent = 'anchoring…';
+          var a = await window.kcc.anchor('STATE', { equip: 'ai-rec-' + dealId, from: 'recommended', to: 'anchored', mode: r.tier, message: r.text.slice(0, 200), actor: 'AI ' + r.provider });
+          anchorBtn.textContent = a && !a.error ? '✓ anchored' : '✗ anchor failed';
+        };
       },
       anchor: function(eventId) {
         if (!window.kcc || !window.kcc.anchor) {

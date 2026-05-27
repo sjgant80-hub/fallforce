@@ -12,6 +12,7 @@ const ROOT = path.resolve(__dirname, '..');
 const MASTER = path.join(ROOT, 'index.html');
 const CLIENTS_DIR = path.join(ROOT, 'clients');
 const GOV_PANEL = path.join(ROOT, 'scripts', 'governance-panels.html');
+const LLM_SHIM = path.join(ROOT, 'scripts', 'llm-cascade.html');
 
 // Open extension primes — fallforce master = 709 (linear)
 const PRIME_POOL = [149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277];
@@ -178,8 +179,9 @@ function buildClient(configPath) {
   if (cfg.workflow === 'procurement' || cfg.workflow === 'governance') {
     html = html.replace(/<body([^>]*)>/, '<body$1 class="workflow-governance">');
   }
-  // Expose + seed go before </body> (anywhere is fine, they're scripts)
-  html = html.replace('</body>', exposeScript + '\n' + seedScript + '\n</body>');
+  // Expose + seed + LLM cascade go before </body>
+  const llmShim = fs.readFileSync(LLM_SHIM, 'utf8');
+  html = html.replace('</body>', exposeScript + '\n' + seedScript + '\n' + llmShim + '\n</body>');
   // Governance panels (the <div class="page"> elements) must live INSIDE <main> alongside the master's pages
   if (/<\/main>/.test(html)) {
     html = html.replace('</main>', govPanel + '\n</main>');
