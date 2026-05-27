@@ -1270,6 +1270,34 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
   body:not(.workflow-governance) .gov-pages { display: none !important; }
   body.workflow-governance .page-gov { padding:24px; max-width:1280px; margin:0 auto; }
 
+  /* ◊·κ P4 · procurement-native surface · hide CRM-only nav items by default */
+  body.workflow-governance.procurement-mode #nav-ai,
+  body.workflow-governance.procurement-mode #nav-autopilot,
+  body.workflow-governance.procurement-mode #nav-goals,
+  body.workflow-governance.procurement-mode #nav-contacts,
+  body.workflow-governance.procurement-mode #nav-companies,
+  body.workflow-governance.procurement-mode #nav-activities,
+  body.workflow-governance.procurement-mode #nav-sequences,
+  body.workflow-governance.procurement-mode #nav-email,
+  body.workflow-governance.procurement-mode #nav-reports {
+    display: none !important;
+  }
+  /* In procurement mode, the dashboard heading is repurposed */
+  body.workflow-governance.procurement-mode .nav-label.crm-only { display: none; }
+  body.workflow-governance.procurement-mode #nav-pipeline .nav-text::after { content: ' (RFQ)'; opacity: 0.6; font-size: 10px; }
+
+  /* ◊·κ P6 · hide any KCC-visible elements on procurement surface */
+  body.workflow-governance.procurement-mode .kcc-visible,
+  body.workflow-governance.procurement-mode #sidebarBloom,
+  body.workflow-governance.procurement-mode .bloom-footer {
+    display: none !important;
+  }
+  body.workflow-governance.procurement-mode.dev-mode .kcc-visible,
+  body.workflow-governance.procurement-mode.dev-mode #sidebarBloom,
+  body.workflow-governance.procurement-mode.dev-mode .bloom-footer {
+    display: revert !important;
+  }
+
   .gov-grid { display:grid; grid-template-columns:1fr 360px; gap:20px; }
   @media (max-width:980px) { .gov-grid { grid-template-columns:1fr; } }
 
@@ -1405,13 +1433,131 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
     if (!hasOverridden) {
       try { localStorage.setItem(NODE.id + '_seed_applied', '1'); } catch(_){}
       // Force a re-render of master views now that deals + stages changed
-      ['renderDashboard','renderPipeline','renderContacts','renderActivities'].forEach(function(fn){
+      ['renderDashboard','renderPipeline','renderPipelineFunnel','renderContacts','renderActivities'].forEach(function(fn){
         if (typeof window[fn] === 'function') { try { window[fn](); } catch(_){} }
       });
     }
+    // ◊·κ P1 · Force pipeline funnel re-render even on reload (not just first seed)
+    // The funnel reads DB.deals + DB.settings.stages — both now procurement.
+    setTimeout(function(){
+      if (typeof window.renderPipelineFunnel === 'function') {
+        try { window.renderPipelineFunnel(); } catch(_){}
+      }
+      // Also update the top "Pipeline Value" KPI
+      try {
+        var total = (window.DB.deals||[]).filter(function(d){ return d.stage !== 'Cancelled'; }).reduce(function(s,d){ return s + (d.value||0); }, 0);
+        var cur = (window.DB.settings && window.DB.settings.currency) || '£';
+        var pt = document.getElementById('pipelineTotal');
+        var pc = document.getElementById('pipelineCount');
+        var kp = document.getElementById('kpi-pipeline');
+        var kd = document.getElementById('kpi-pipeline-delta');
+        if (pt) pt.textContent = cur + (total/1000).toFixed(0) + 'k';
+        if (pc) pc.textContent = (window.DB.deals||[]).length + ' active RFQs';
+        if (kp) kp.textContent = cur + (total/1000).toFixed(0) + 'k';
+        if (kd) { kd.textContent = '▲ ' + (window.DB.deals||[]).length + ' RFQs · £' + total.toLocaleString(); kd.classList.remove('up','down'); kd.classList.add('up'); }
+      } catch(_){}
+    }, 150);
 
     // 2. Persist helper
     function persist() { try { localStorage.setItem('fallforce_db', JSON.stringify(window.DB)); } catch(_){} }
+
+    // ════════════════════════════════════════════════════════════════
+    // ◊·κ MANSOOR'S 6 · P2 (48h ageing) + P3 (audit chain integrity)
+    // ════════════════════════════════════════════════════════════════
+    // Active policy config — version locked at decision time
+    var APEX_CONFIG = {
+      version: 'apex-procurement-v2.4',
+      ageingHours: 48,
+      rules: (window.GOV_SEED && window.GOV_SEED.escalation_rules) || [],
+      stages: (window.DB.settings && window.DB.settings.stages) || []
+    };
+    APEX_CONFIG.hash = simpleHash(JSON.stringify({ v: APEX_CONFIG.version, r: APEX_CONFIG.rules, s: APEX_CONFIG.stages }));
+    window._apexConfig = APEX_CONFIG;
+
+    // Tiny synchronous hash (DJB2 + hex) · OK for tamper detection at this scale
+    function simpleHash(s) {
+      var h = 5381;
+      for (var i = 0; i < s.length; i++) { h = ((h << 5) + h) ^ s.charCodeAt(i); }
+      // 32-bit unsigned, then hex
+      return ((h >>> 0).toString(16) + (s.length.toString(16))).padStart(10, '0').slice(-10);
+    }
+
+    // Retrofit lastStateChange + initial doc hash on every seed deal
+    (window.DB.deals || []).forEach(function(d){
+      if (!d.lastStateChange) d.lastStateChange = d._seedTs || (Date.now() - Math.floor(Math.random() * 36) * 3600000); // randomised within last 36h so we don't immediately escalate everything
+      if (!d._docHash) d._docHash = simpleHash(JSON.stringify({ id:d.id, name:d.name, value:d.value, stage:d.stage, company:d.company, notes:d.notes||'' }));
+    });
+
+    // ◊·κ P3 · Compute prevHash · returns hex hash of the last audit event
+    function lastHash() {
+      var log = window.DB.audit_log || [];
+      if (!log.length) return '0000000000';
+      var e = log[0]; // log is unshifted, so [0] is most recent
+      return simpleHash(JSON.stringify({ id:e.id, ts:e.ts, actor:e.actor, message:e.message, deal:e.deal, kind:e.kind, prevHash:e.prevHash||'' }));
+    }
+
+    // ◊·κ P3 · Hash of the current deal document (so future tamper is detectable)
+    function dealDocHash(dealId) {
+      var d = (window.DB.deals || []).find(function(x){ return x.id === dealId; });
+      if (!d) return null;
+      var snap = { id:d.id, name:d.name, value:d.value, stage:d.stage, company:d.company, notes:d.notes||'' };
+      return simpleHash(JSON.stringify(snap));
+    }
+
+    // ◊·κ P2 · Event-driven ageing scan · NOT polling
+    // Fires after every state-change event · escalates any RFQ over threshold immediately
+    function checkAllAgeingThresholds(triggeredBy) {
+      var now = Date.now();
+      var thresholdMs = APEX_CONFIG.ageingHours * 3600000;
+      var deals = window.DB.deals || [];
+      var newlyEscalated = 0;
+      deals.forEach(function(d){
+        if (d.stage === 'Awarded' || d.stage === 'Audit Cleared' || d.stage === 'Cancelled') return;
+        if (d._ageingEscalated) return; // idempotent — only escalate once per deal
+        var hours = (now - (d.lastStateChange || now)) / 3600000;
+        if (hours >= APEX_CONFIG.ageingHours) {
+          d._ageingEscalated = true;
+          var exists = (window.DB.escalations || []).find(function(e){ return e.deal_id === d.id && e.reason && e.reason.indexOf('ageing_48h') !== -1 && !e.resolved; });
+          if (!exists) {
+            window.DB.escalations.push({
+              id: 'esc_age_' + Date.now() + '_' + d.id,
+              deal_id: d.id,
+              title: 'Ageing breach (>' + APEX_CONFIG.ageingHours + 'h) · ' + d.name,
+              opened_at: now,
+              resolved: false,
+              reason: 'ageing_48h · ' + hours.toFixed(1) + 'h since last state change' + (triggeredBy ? ' · scan triggered by ' + triggeredBy : '')
+            });
+            logAudit('system', 'Auto-escalated (ageing) · ' + hours.toFixed(1) + 'h since last state change', d.name, 'escalation', {
+              reasoning: 'Deal sat at stage "' + d.stage + '" for ' + hours.toFixed(1) + 'h without a reviewer state change. Threshold is ' + APEX_CONFIG.ageingHours + 'h. Rule: ageing_48h.',
+              dealId: d.id
+            });
+            newlyEscalated++;
+          }
+        }
+      });
+      if (newlyEscalated > 0) {
+        persist();
+        if (typeof renderEscalation === 'function') renderEscalation();
+        if (typeof renderAudit === 'function') renderAudit();
+      }
+      return newlyEscalated;
+    }
+    window._checkAgeing = checkAllAgeingThresholds;
+
+    // ◊·κ P3 · Verify the audit chain · returns { ok, brokenAt, length }
+    function verifyChain() {
+      var log = (window.DB.audit_log || []).slice().reverse(); // oldest-first
+      var prev = '0000000000';
+      for (var i = 0; i < log.length; i++) {
+        var e = log[i];
+        if (e.prevHash && e.prevHash !== prev) {
+          return { ok: false, brokenAt: i, length: log.length, expected: prev, found: e.prevHash };
+        }
+        prev = simpleHash(JSON.stringify({ id:e.id, ts:e.ts, actor:e.actor, message:e.message, deal:e.deal, kind:e.kind, prevHash:e.prevHash||'' }));
+      }
+      return { ok: true, length: log.length };
+    }
+    window._verifyChain = verifyChain;
 
     // 3. Render Reviewer Console
     function renderReviewers() {
@@ -1461,20 +1607,25 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
         '</tbody></table>';
     }
 
-    // 4. Render Audit Trail
+    // 4. Render Audit Trail · P3 · with chain integrity + reasoning + doc/config hashes
     function renderAudit() {
       var log = (window.DB.audit_log || []).slice().sort(function(a,b){ return b.ts - a.ts; });
+      var chain = verifyChain();
       var sums = {
         events: log.length,
         flagged: log.filter(function(e){ return e.kind === 'flag'; }).length,
         approvals: log.filter(function(e){ return e.kind === 'approve'; }).length,
-        anchored: log.filter(function(e){ return e.bsv_tx; }).length
+        anchored: log.filter(function(e){ return e.bsv_tx; }).length,
+        withReasoning: log.filter(function(e){ return e.reasoning; }).length
       };
+      var chainBadge = chain.ok
+        ? '<span style="color:#22c55e">✓ intact · ' + chain.length + ' events</span>'
+        : '<span style="color:#ef4444">✗ BROKEN at event ' + chain.brokenAt + ' (expected ' + chain.expected + ', got ' + chain.found + ')</span>';
       document.getElementById('audit-stats').innerHTML =
-        '<div class="stat-card"><div class="stat-label">Events</div><div class="stat-value">'+sums.events+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Events</div><div class="stat-value">'+sums.events+'</div><div class="stat-sub">chain ' + chainBadge + '</div></div>' +
         '<div class="stat-card"><div class="stat-label">Approvals</div><div class="stat-value" style="color:#22c55e">'+sums.approvals+'</div></div>' +
         '<div class="stat-card"><div class="stat-label">Flags</div><div class="stat-value" style="color:#ef4444">'+sums.flagged+'</div></div>' +
-        '<div class="stat-card"><div class="stat-label">BSV-anchored</div><div class="stat-value" style="color:#f7931a">'+sums.anchored+'</div><div class="stat-sub">on-chain audit</div></div>';
+        '<div class="stat-card"><div class="stat-label">With reasoning</div><div class="stat-value" style="color:#d4af37">'+sums.withReasoning+'</div><div class="stat-sub">of '+sums.events+' events</div></div>';
 
       var feed = log.slice(0, 200).map(function(e){
         var when = new Date(e.ts).toLocaleString();
@@ -1482,17 +1633,199 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
         if (e.kind === 'flag') cls = 'flagged';
         else if (e.kind === 'escalation') cls = 'escalation';
         else if (e.bsv_tx) cls = 'bsv-anchor';
+        // P3 · check if document at decision time still matches current doc hash
+        var docIntegrity = '';
+        if (e.documentHash) {
+          // We don't have the dealId on every event — use deal name lookup
+          var nowDeal = (window.DB.deals || []).find(function(d){ return d.name === e.deal; });
+          if (nowDeal) {
+            var nowHash = dealDocHash(nowDeal.id);
+            docIntegrity = nowHash === e.documentHash
+              ? ' <span title="Document unchanged since decision" style="color:#22c55e;font-size:9px;font-family:DM Mono,monospace">[doc·✓]</span>'
+              : ' <span title="Document changed since decision (was ' + e.documentHash + ', now ' + nowHash + ')" style="color:#ef4444;font-size:9px;font-family:DM Mono,monospace">[doc·MISMATCH]</span>';
+          }
+        }
+        var configTag = e.configVersion ? ' <span title="Policy version active at decision" style="color:#8b8b8b;font-size:9px;font-family:DM Mono,monospace">' + esc(e.configVersion) + '</span>' : '';
+        var reasoningRow = e.reasoning
+          ? '<div style="grid-column: 2/3; font-size:10px;color:#8b8b8b;font-style:italic;padding-top:4px;border-top:1px dashed rgba(255,255,255,0.08);margin-top:4px">→ ' + esc(e.reasoning) + '</div>'
+          : '';
+        var hashRow = e.prevHash
+          ? '<div style="grid-column: 2/3; font-size:9px;color:#5a5a5a;font-family:DM Mono,monospace;padding-top:2px">prev:' + esc(e.prevHash) + configTag + docIntegrity + '</div>'
+          : '';
         var anchorBtn = !e.bsv_tx
-          ? '<button class="bsv-btn" onclick="window.gov.anchor(\''+e.id+'\')" title="Anchor this event to BSV (≈20 $KONO via OnlyBrains)">⚓ anchor</button>'
+          ? '<button class="bsv-btn" onclick="window.gov.anchor(\''+e.id+'\')" title="Anchor this event to BSV">⚓ anchor</button>'
           : '<a href="#" class="audit-actor" title="BSV tx (mock)">tx '+(e.bsv_tx || '').slice(0, 10)+'…</a>';
         return '<div class="audit-row '+cls+'">' +
           '<div class="audit-when">'+when+'</div>' +
-          '<div class="audit-msg"><strong>'+esc(e.actor || 'system')+'</strong> · '+esc(e.message)+(e.deal?' <span style="color:var(--muted)">on '+esc(e.deal)+'</span>':'')+'</div>' +
+          '<div class="audit-msg"><strong>'+esc(e.actor || 'system')+'</strong> · '+esc(e.message)+(e.deal?' <span style="color:var(--muted)">on '+esc(e.deal)+'</span>':'')+reasoningRow+hashRow+'</div>' +
           anchorBtn +
         '</div>';
       }).join('');
       document.getElementById('audit-feed').innerHTML = feed || '<div style="text-align:center;color:var(--muted);padding:24px">No events yet.</div>';
     }
+
+    // ◊·κ P1 · pipeline KPI recalc — total of all open RFQs across all stages
+    function recalcPipelineKPIs() {
+      try {
+        var deals = window.DB.deals || [];
+        var openTotal = deals.filter(function(d){ return d.stage !== 'Cancelled'; }).reduce(function(s,d){ return s + (d.value||0); }, 0);
+        var cur = (window.DB.settings && window.DB.settings.currency) || '£';
+        var pt = document.getElementById('pipelineTotal');
+        var pc = document.getElementById('pipelineCount');
+        var kp = document.getElementById('kpi-pipeline');
+        var kd = document.getElementById('kpi-pipeline-delta');
+        if (pt) pt.textContent = cur + (openTotal/1000).toFixed(0) + 'k';
+        if (pc) pc.textContent = deals.length + ' active RFQs';
+        if (kp) kp.textContent = cur + (openTotal/1000).toFixed(0) + 'k';
+        if (kd) { kd.textContent = '▲ ' + deals.length + ' RFQs · £' + openTotal.toLocaleString(); kd.classList.remove('up','down'); kd.classList.add('up'); }
+      } catch(_){}
+    }
+    window._recalcPipelineKPIs = recalcPipelineKPIs;
+
+    // ◊·κ P2 · initial ageing scan on load (catches RFQs that were dormant before page open)
+    setTimeout(function(){ checkAllAgeingThresholds('boot'); }, 250);
+
+    // ════════════════════════════════════════════════════════════════
+    // ◊·κ P4 · PROCUREMENT-NATIVE SURFACE · CRM nav hidden by default
+    // ════════════════════════════════════════════════════════════════
+    document.body.classList.add('procurement-mode');
+    // Restore dev mode preference (shows KCC etc.)
+    try { if (localStorage.getItem('apex_dev_mode') === '1') document.body.classList.add('dev-mode'); } catch(_){}
+
+    // Pipeline page subtitle becomes RFQ-native + dashboard greeting changes
+    setTimeout(function(){
+      var pageSub = document.getElementById('pipelineSubtitle');
+      if (pageSub) pageSub.textContent = 'RFQ pipeline by stage · drag to move · audit-bound';
+      var pipeLabel = document.querySelector('#nav-pipeline .nav-text');
+      if (pipeLabel) pipeLabel.textContent = 'RFQ Pipeline';
+    }, 200);
+
+    // ════════════════════════════════════════════════════════════════
+    // ◊·κ P5 · MULTI-DEVICE SYNC · JSON export/import + optional endpoint
+    // ════════════════════════════════════════════════════════════════
+    window.apexSync = {
+      exportAll: function() {
+        try {
+          var blob = new Blob([JSON.stringify({
+            schemaVersion: 'apex-v1',
+            exportedAt: Date.now(),
+            db: window.DB,
+            config: APEX_CONFIG
+          }, null, 2)], { type: 'application/json' });
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'apex-procurement-export-' + new Date().toISOString().slice(0,10) + '.json';
+          a.click();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+          logAudit('procurement-lead', 'Data exported · ' + (window.DB.audit_log||[]).length + ' audit events · ' + (window.DB.deals||[]).length + ' RFQs', null, 'note', { reasoning: 'Full snapshot export for multi-device sync or backup' });
+        } catch(e) { alert('Export failed: ' + e.message); }
+      },
+      importFromString: function(jsonText, mode) {
+        mode = mode || 'merge';
+        try {
+          var parsed = JSON.parse(jsonText);
+          if (!parsed.db) throw new Error('not an apex export · missing .db');
+          if (mode === 'replace') {
+            window.DB = parsed.db;
+          } else {
+            // Merge: union audit logs, prefer incoming deals, union signoffs/escalations
+            window.DB.audit_log = (parsed.db.audit_log || []).concat(window.DB.audit_log || []);
+            // De-dupe by id
+            var seen = {};
+            window.DB.audit_log = window.DB.audit_log.filter(function(e){ if (seen[e.id]) return false; seen[e.id] = 1; return true; }).sort(function(a,b){ return b.ts - a.ts; });
+            window.DB.deals = parsed.db.deals || window.DB.deals;
+            window.DB.escalations = parsed.db.escalations || window.DB.escalations;
+            window.DB.signoffs = Object.assign({}, window.DB.signoffs || {}, parsed.db.signoffs || {});
+          }
+          persist();
+          renderReviewers(); renderAudit(); renderEscalation();
+          if (typeof window.renderPipelineFunnel === 'function') window.renderPipelineFunnel();
+          recalcPipelineKPIs();
+          logAudit('procurement-lead', 'Data imported (' + mode + ') · ' + (parsed.db.audit_log||[]).length + ' events', null, 'note', { reasoning: 'Multi-device sync · imported snapshot via ' + mode });
+          alert('Imported · ' + (parsed.db.deals||[]).length + ' RFQs · ' + (parsed.db.audit_log||[]).length + ' events · ' + (parsed.db.escalations||[]).length + ' escalations');
+        } catch(e) { alert('Import failed: ' + e.message); }
+      },
+      importFromFile: function() {
+        var inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = '.json,application/json';
+        inp.onchange = function(e){
+          var f = e.target.files[0]; if (!f) return;
+          var reader = new FileReader();
+          reader.onload = function(){
+            var mode = confirm('OK = MERGE with current data · Cancel = REPLACE everything') ? 'merge' : 'replace';
+            window.apexSync.importFromString(reader.result, mode);
+          };
+          reader.readAsText(f);
+        };
+        inp.click();
+      },
+      // Optional self-hosted sync endpoint · they deploy the URL
+      pushEndpoint: async function() {
+        var url = localStorage.getItem('apex_sync_url');
+        var teamId = localStorage.getItem('apex_team_id') || 'default';
+        if (!url) { alert('Set Sync URL first in Settings → Sync'); return; }
+        try {
+          var r = await fetch(url.replace(/\/$/, '') + '/sync/' + encodeURIComponent(teamId), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ schemaVersion:'apex-v1', exportedAt: Date.now(), db: window.DB })
+          });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          logAudit('system', 'Pushed to sync endpoint · team ' + teamId, null, 'note', { reasoning: 'Multi-device sync · POST to self-hosted endpoint' });
+          alert('Pushed to ' + url);
+        } catch(e) { alert('Push failed: ' + e.message); }
+      },
+      pullEndpoint: async function() {
+        var url = localStorage.getItem('apex_sync_url');
+        var teamId = localStorage.getItem('apex_team_id') || 'default';
+        if (!url) { alert('Set Sync URL first in Settings → Sync'); return; }
+        try {
+          var r = await fetch(url.replace(/\/$/, '') + '/sync/' + encodeURIComponent(teamId));
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          var txt = await r.text();
+          window.apexSync.importFromString(txt, 'merge');
+        } catch(e) { alert('Pull failed: ' + e.message); }
+      },
+      configureEndpoint: function() {
+        var url = prompt('Self-hosted sync URL (your server · POST/GET /sync/:teamId)\n\nExample Cloudflare Worker · 10 lines · you own the data.\nLeave blank to disable.', localStorage.getItem('apex_sync_url') || '');
+        if (url === null) return;
+        if (url) localStorage.setItem('apex_sync_url', url); else localStorage.removeItem('apex_sync_url');
+        var team = prompt('Team ID (any string · same on all devices)', localStorage.getItem('apex_team_id') || 'default');
+        if (team) localStorage.setItem('apex_team_id', team);
+        alert('Sync endpoint ' + (url ? 'set: ' + url + ' · team: ' + team : 'cleared'));
+      }
+    };
+
+    // ════════════════════════════════════════════════════════════════
+    // ◊·κ P6 · DEV MODE TOGGLE · show/hide KCC bloom visibility
+    // ════════════════════════════════════════════════════════════════
+    window.apexDevMode = {
+      toggle: function() {
+        var on = !document.body.classList.contains('dev-mode');
+        document.body.classList.toggle('dev-mode', on);
+        try { localStorage.setItem('apex_dev_mode', on ? '1' : '0'); } catch(_){}
+        alert('Developer mode ' + (on ? 'ON · KCC/bloom now visible' : 'OFF · KCC hidden from reviewer surface'));
+      },
+      status: function() { return document.body.classList.contains('dev-mode'); }
+    };
+
+    // ════════════════════════════════════════════════════════════════
+    // ◊·κ P4 · Procurement quick-action bar · always visible in top toolbar
+    // ════════════════════════════════════════════════════════════════
+    setTimeout(function(){
+      var bar = document.createElement('div');
+      bar.id = 'apex-procurement-bar';
+      bar.style.cssText = 'position:fixed;top:14px;right:14px;z-index:9000;display:flex;gap:6px;background:rgba(20,22,30,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 8px;font-family:DM Mono,monospace;font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,0.4);';
+      bar.innerHTML =
+        '<button onclick="showPage(\'reviewers\')" style="background:rgba(212,175,55,0.15);color:#d4af37;border:1px solid rgba(212,175,55,0.4);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">Open RFQs</button>' +
+        '<button onclick="showPage(\'escalation\')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">Escalations</button>' +
+        '<button onclick="showPage(\'audit\')" style="background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.4);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">Audit Trail</button>' +
+        '<button onclick="window.apexSync.exportAll()" title="Export full snapshot as JSON" style="background:rgba(120,130,140,0.15);color:#aab1ba;border:1px solid rgba(120,130,140,0.3);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">↓ Export</button>' +
+        '<button onclick="window.apexSync.importFromFile()" title="Import a previously-exported JSON file" style="background:rgba(120,130,140,0.15);color:#aab1ba;border:1px solid rgba(120,130,140,0.3);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">↑ Import</button>' +
+        '<button onclick="window.apexSync.configureEndpoint()" title="Configure your self-hosted sync URL (POST/GET /sync/:teamId)" style="background:rgba(120,130,140,0.15);color:#aab1ba;border:1px solid rgba(120,130,140,0.3);padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px">⇋ Sync</button>' +
+        '<button onclick="window.apexDevMode.toggle()" title="Toggle developer view (show/hide KCC + bloom)" style="background:rgba(120,130,140,0.1);color:#5a5a5a;border:1px solid rgba(120,130,140,0.2);padding:5px 8px;border-radius:5px;cursor:pointer;font-size:10px">dev</button>';
+      document.body.appendChild(bar);
+    }, 500);
 
     // 5. Render Escalation Tree
     function renderEscalation() {
@@ -1520,10 +1853,27 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
 
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
 
-    // 6. Actions
-    function logAudit(actor, message, deal, kind) {
+    // ◊·κ P3 · 6. Actions · logAudit now writes chained events
+    // Extra metadata via opts: { reasoning, dealId, documentHash, configVersion }
+    function logAudit(actor, message, deal, kind, opts) {
       window.DB.audit_log = window.DB.audit_log || [];
-      var ev = { id: 'ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), ts: Date.now(), actor: actor, message: message, deal: deal || null, kind: kind || 'note' };
+      opts = opts || {};
+      var dealId = opts.dealId || null;
+      var docHash = opts.documentHash || (dealId ? dealDocHash(dealId) : null);
+      var ev = {
+        id: 'ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        ts: Date.now(),
+        actor: actor,
+        message: message,
+        deal: deal || null,
+        kind: kind || 'note',
+        // ◊·κ P3 audit chain integrity fields
+        prevHash: lastHash(),
+        reasoning: opts.reasoning || null,
+        documentHash: docHash,
+        configVersion: opts.configVersion || APEX_CONFIG.version,
+        configHash: APEX_CONFIG.hash
+      };
       window.DB.audit_log.unshift(ev);
       if (window.DB.audit_log.length > 2000) window.DB.audit_log.length = 2000;
       persist();
@@ -1533,6 +1883,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
       }
       return ev;
     }
+    window._logAudit = logAudit;
 
     window.gov = {
       cycleSignoff: function(dealId, reviewerId) {
@@ -1541,36 +1892,61 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
         var next = cur === 'pending' ? 'approved' : cur === 'approved' ? 'flagged' : 'pending';
         s[reviewerId] = next;
         var reviewer = (window.DB.reviewers.find(function(r){ return r.id === reviewerId; }) || {}).name || reviewerId;
-        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || {}).name || dealId;
-        logAudit(reviewer, next + ' (' + cur + ' → ' + next + ')', deal, next === 'approved' ? 'approve' : next === 'flagged' ? 'flag' : 'note');
+        var dealObj = window.DB.deals.find(function(d){ return d.id === dealId; });
+        var deal = (dealObj || {}).name || dealId;
+        // ◊·κ P2 · update state-change timestamp
+        if (dealObj) dealObj.lastStateChange = Date.now();
+        // ◊·κ P3 · prompt reviewer for reasoning when flagging (decision bound to audit)
+        var reasoning = null;
+        if (next === 'flagged') {
+          reasoning = prompt('Reason for flagging "' + deal + '"?\n(stored in the audit chain · bound to this decision)', '') || 'no reason given';
+        } else if (next === 'approved' && (dealObj && dealObj.value > 100000)) {
+          reasoning = prompt('Reasoning for approving "' + deal + '" (£' + (dealObj.value||0).toLocaleString() + ')?\n(>£100k items require reasoning)', '') || 'no reasoning recorded';
+        }
+        logAudit(reviewer, next + ' (' + cur + ' → ' + next + ')', deal, next === 'approved' ? 'approve' : next === 'flagged' ? 'flag' : 'note', { dealId: dealId, reasoning: reasoning });
         // Auto-escalate if 2+ flags on the same deal
         var flags = Object.values(s).filter(function(x){ return x === 'flagged'; }).length;
         if (flags >= 2) {
           var exists = window.DB.escalations.find(function(e){ return e.deal_id === dealId && !e.resolved; });
           if (!exists) {
             window.DB.escalations.push({ id:'esc_'+Date.now(), deal_id:dealId, title:'Reviewer disagreement · ' + deal, opened_at:Date.now(), resolved:false, reason: flags + ' reviewers flagged' });
-            logAudit('system', 'Auto-escalated · ' + flags + ' reviewer flags', deal, 'escalation');
+            logAudit('system', 'Auto-escalated · ' + flags + ' reviewer flags', deal, 'escalation', { dealId: dealId, reasoning: 'Two or more reviewers flagged the same item. Per policy rule "2+ reviewers flag the same item → auto-open escalation".' });
           }
         }
+        // ◊·κ P2 · event-driven ageing scan on every state change
+        checkAllAgeingThresholds('cycleSignoff:' + dealId);
         persist();
         renderReviewers(); renderAudit(); renderEscalation();
+        if (typeof window.renderPipelineFunnel === 'function') window.renderPipelineFunnel(); // P1
+        recalcPipelineKPIs();
       },
       approveAll: function(dealId) {
         var s = window.DB.signoffs[dealId] || (window.DB.signoffs[dealId] = {});
         window.DB.reviewers.forEach(function(r){ s[r.id] = 'approved'; });
-        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || {}).name || dealId;
-        logAudit('procurement-lead', 'Approve-all on ' + deal, deal, 'approve');
+        var dealObj = window.DB.deals.find(function(d){ return d.id === dealId; });
+        var deal = (dealObj || {}).name || dealId;
+        if (dealObj) dealObj.lastStateChange = Date.now();
+        var reasoning = prompt('Reasoning for approving all reviewers on "' + deal + '"?\n(bound to the audit chain)', '') || 'no reasoning recorded';
+        logAudit('procurement-lead', 'Approve-all on ' + deal, deal, 'approve', { dealId: dealId, reasoning: reasoning });
+        checkAllAgeingThresholds('approveAll:' + dealId);
         persist();
         renderReviewers(); renderAudit();
+        if (typeof window.renderPipelineFunnel === 'function') window.renderPipelineFunnel();
+        recalcPipelineKPIs();
       },
       escalate: function(dealId) {
-        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || {}).name || dealId;
+        var dealObj = window.DB.deals.find(function(d){ return d.id === dealId; });
+        var deal = (dealObj || {}).name || dealId;
         var reason = prompt('Escalation reason for ' + deal, '');
         if (reason === null) return;
+        if (dealObj) dealObj.lastStateChange = Date.now();
         window.DB.escalations.push({ id:'esc_'+Date.now(), deal_id:dealId, title:'Manual escalation · ' + deal, opened_at:Date.now(), resolved:false, reason: reason || 'no reason given' });
-        logAudit('procurement-lead', 'Manually escalated · ' + (reason || 'no reason'), deal, 'escalation');
+        logAudit('procurement-lead', 'Manually escalated · ' + (reason || 'no reason'), deal, 'escalation', { dealId: dealId, reasoning: reason || 'no reasoning recorded' });
+        checkAllAgeingThresholds('escalate:' + dealId);
         persist();
         renderReviewers(); renderAudit(); renderEscalation();
+        if (typeof window.renderPipelineFunnel === 'function') window.renderPipelineFunnel();
+        recalcPipelineKPIs();
       },
       resolveEscalation: function(escId) {
         var e = window.DB.escalations.find(function(x){ return x.id === escId; });
@@ -1580,9 +1956,16 @@ body{background:var(--bg);color:var(--ink);font-family:'Syne',sans-serif;min-hei
         e.resolved = true;
         e.resolved_at = Date.now();
         e.resolution = note;
-        logAudit('procurement-lead', 'Resolved escalation · ' + (note || ''), e.title, 'note');
+        var dealObj = e.deal_id ? window.DB.deals.find(function(d){ return d.id === e.deal_id; }) : null;
+        if (dealObj) dealObj.lastStateChange = Date.now();
+        // Clear the ageing flag so future scans can re-fire if it sits again
+        if (dealObj) dealObj._ageingEscalated = false;
+        logAudit('procurement-lead', 'Resolved escalation · ' + (note || ''), e.title, 'note', { dealId: e.deal_id, reasoning: note || 'no reasoning recorded' });
+        checkAllAgeingThresholds('resolveEscalation:' + escId);
         persist();
         renderEscalation(); renderAudit();
+        if (typeof window.renderPipelineFunnel === 'function') window.renderPipelineFunnel();
+        recalcPipelineKPIs();
       },
       askAI: async function(dealId) {
         var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || null);
