@@ -1,0 +1,73 @@
+{
+  "client_name": "Apex Procurement",
+  "slug": "apex-procurement",
+  "product_name": "ApexOps",
+  "client_logo_text": "Apex",
+  "tagline": "Multi-stakeholder sign-off · audit-grade trail · escalation under reviewer pressure.",
+  "trial_days": 30,
+  "konomi_visible": true,
+  "workflow": "procurement",
+  "brand": {
+    "accent": "#5078DC",
+    "accent_dim": "rgba(80,120,220,0.18)"
+  },
+  "pipeline_stages": [
+    "RFQ Drafted",
+    "Suppliers Shortlisted",
+    "Bids Received",
+    "Bid Review",
+    "Awarded",
+    "Contract Issued",
+    "Delivered",
+    "Audit Cleared"
+  ],
+  "reviewers": [
+    { "id": "rev-compliance", "name": "Compliance Officer", "short": "Comp",  "role": "Regulatory / policy",  "email": "compliance@apex.example" },
+    { "id": "rev-finance",    "name": "Finance Reviewer",   "short": "Fin",   "role": "Budget / commercial",  "email": "finance@apex.example" },
+    { "id": "rev-legal",      "name": "Legal Counsel",      "short": "Legal", "role": "Contract / liability", "email": "legal@apex.example" },
+    { "id": "rev-procure",    "name": "Procurement Lead",   "short": "Proc",  "role": "Final approval",       "email": "lead@apex.example" }
+  ],
+  "escalation_rules": [
+    { "when": "2+ reviewers flag the same item",            "then": "Auto-open escalation · notify Procurement Lead" },
+    { "when": "Item value > £250,000 and any reviewer pending >48h", "then": "Auto-escalate to Director (Sponsor sign-off required)" },
+    { "when": "Sole-source justification missing on award",  "then": "Block stage transition · raise Compliance flag" },
+    { "when": "Single supplier in shortlist after 5 working days", "then": "Auto-escalate · request alternates" },
+    { "when": "Contract terms diverge >10% from RFQ scope", "then": "Re-route to Legal · halt Award stage" }
+  ],
+  "seed_deals": [
+    { "id":"d1", "name":"Cloud Infrastructure Renewal (3yr)",   "contact":"c1","company":"NorthPoint Logistics", "value":485000, "stage":"Bid Review",            "probability":70, "closeDate":"2026-06-15", "status":"hot",  "notes":"3 bids received. Pricing spread 18%. Legal raised SLA concern on bid 2." },
+    { "id":"d2", "name":"Industrial Robots — Line 4 Retrofit",  "contact":"c2","company":"Sterling Manufacturing","value":1240000,"stage":"Suppliers Shortlisted","probability":45, "closeDate":"2026-07-30", "status":"hot",  "notes":"Single shortlisted supplier — Procurement Lead flagged for sole-source review." },
+    { "id":"d3", "name":"Annual Audit Services Contract",       "contact":"c3","company":"Vertex Holdings",      "value":78000,  "stage":"Awarded",              "probability":100,"closeDate":"2026-04-30", "status":"won",  "notes":"Awarded after 4-bid review. Compliance + Finance + Legal all approved. Contract issued." },
+    { "id":"d4", "name":"PPE Quarterly Replenishment",          "contact":"c4","company":"GreenField Industries","value":42000,  "stage":"Delivered",            "probability":100,"closeDate":"2026-04-10", "status":"won",  "notes":"Standard reorder. Now awaiting audit cleared signoff." },
+    { "id":"d5", "name":"Specialist Consultancy — IT Strategy", "contact":"c5","company":"Helios Group",         "value":195000, "stage":"Bid Review",            "probability":55, "closeDate":"2026-05-22", "status":"warm", "notes":"2 bids over budget. Finance flagged for re-scope discussion." },
+    { "id":"d6", "name":"Fleet Service Contract (24mo)",        "contact":"c6","company":"Atlas Distribution",   "value":312000, "stage":"Contract Issued",      "probability":95, "closeDate":"2026-05-08", "status":"hot",  "notes":"Legal flagged liability clause — Compliance pending on data-sharing addendum." },
+    { "id":"d7", "name":"Translation Services Framework",       "contact":"c1","company":"NorthPoint Logistics", "value":58000,  "stage":"RFQ Drafted",          "probability":15, "closeDate":"2026-07-01", "status":"cold", "notes":"Draft RFQ awaiting Procurement Lead approval before going to market." }
+  ],
+  "signoffs": {
+    "d1": { "rev-compliance": "approved", "rev-finance": "approved", "rev-legal": "flagged",  "rev-procure": "pending" },
+    "d2": { "rev-compliance": "flagged",  "rev-finance": "pending",  "rev-legal": "pending",  "rev-procure": "flagged" },
+    "d3": { "rev-compliance": "approved", "rev-finance": "approved", "rev-legal": "approved", "rev-procure": "approved" },
+    "d4": { "rev-compliance": "approved", "rev-finance": "approved", "rev-legal": "approved", "rev-procure": "pending" },
+    "d5": { "rev-compliance": "pending",  "rev-finance": "flagged",  "rev-legal": "pending",  "rev-procure": "pending" },
+    "d6": { "rev-compliance": "pending",  "rev-finance": "approved", "rev-legal": "flagged",  "rev-procure": "pending" }
+  },
+  "escalations": [
+    { "id":"esc-1", "deal_id":"d2", "title":"Reviewer disagreement · Industrial Robots Retrofit", "opened_at":1779200000000, "resolved":false, "reason":"Compliance + Procurement Lead both flagged · sole-source missing" },
+    { "id":"esc-2", "deal_id":"d6", "title":"Legal block · Fleet Service Contract data-sharing clause", "opened_at":1779286400000, "resolved":false, "reason":"Legal flagged contract diverges from RFQ data-sharing scope" }
+  ],
+  "audit_log": [
+    { "actor":"Compliance Officer",  "message":"Approved · scope matches RFQ",                   "deal":"Annual Audit Services Contract", "kind":"approve" },
+    { "actor":"Finance Reviewer",    "message":"Approved · within Q2 budget",                    "deal":"Annual Audit Services Contract", "kind":"approve" },
+    { "actor":"Legal Counsel",       "message":"Approved · standard liability terms",            "deal":"Annual Audit Services Contract", "kind":"approve" },
+    { "actor":"Procurement Lead",    "message":"Awarded to Bidder 3 · contract issued",          "deal":"Annual Audit Services Contract", "kind":"approve" },
+    { "actor":"Compliance Officer",  "message":"Flagged · sole-source justification missing",    "deal":"Industrial Robots Retrofit",     "kind":"flag" },
+    { "actor":"Procurement Lead",    "message":"Flagged · need 2 more shortlisted suppliers",    "deal":"Industrial Robots Retrofit",     "kind":"flag" },
+    { "actor":"system",              "message":"Auto-escalated · 2 reviewer flags",              "deal":"Industrial Robots Retrofit",     "kind":"escalation" },
+    { "actor":"Legal Counsel",       "message":"Flagged · liability clause not in RFQ scope",    "deal":"Fleet Service Contract",         "kind":"flag" },
+    { "actor":"Legal Counsel",       "message":"Flagged · SLA missing termination triggers",     "deal":"Cloud Infrastructure Renewal",   "kind":"flag" },
+    { "actor":"Finance Reviewer",    "message":"Approved · pricing within forecast",             "deal":"Cloud Infrastructure Renewal",   "kind":"approve" },
+    { "actor":"Compliance Officer",  "message":"Approved · vendor on approved list",             "deal":"Cloud Infrastructure Renewal",   "kind":"approve" },
+    { "actor":"Finance Reviewer",    "message":"Flagged · both bids 14% over budget",            "deal":"IT Strategy Consultancy",        "kind":"flag" },
+    { "actor":"Procurement Lead",    "message":"RFQ scope reviewed · returned for amendment",    "deal":"Translation Services Framework", "kind":"note" }
+  ]
+}

@@ -1,0 +1,405 @@
+<!-- ◊ GOVERNANCE OVERLAY · Reviewer Console + Audit Trail + Escalation Tree
+     Injected only into per-client builds with workflow='procurement' (or any governance workflow).
+     Reads + writes the same DB object the master uses · stays in sync with deal moves. -->
+<style>
+  /* gov pages use normal .page / .page.active flow; only block them entirely outside governance workflow */
+  body:not(.workflow-governance) .gov-pages { display: none !important; }
+  body.workflow-governance .page-gov { padding:24px; max-width:1280px; margin:0 auto; }
+
+  .gov-grid { display:grid; grid-template-columns:1fr 360px; gap:20px; }
+  @media (max-width:980px) { .gov-grid { grid-template-columns:1fr; } }
+
+  .gov-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .gov-card h3 { font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 14px; font-family:'DM Mono',monospace; }
+  .gov-tag { display:inline-flex; gap:4px; padding:2px 8px; border-radius:999px; font-size:10px; font-family:'DM Mono',monospace; letter-spacing:.04em; background:var(--surface3); color:var(--muted); font-weight:600; }
+  .gov-tag.go    { background:rgba(58,154,114,.18); color:#22c55e; }
+  .gov-tag.wait  { background:rgba(200,126,58,.18); color:#c87e3a; }
+  .gov-tag.no    { background:rgba(200,74,74,.18); color:#ef4444; }
+  .gov-tag.escal { background:rgba(212,175,55,.18); color:#d4af37; }
+
+  .rev-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .rev-table th { text-align:left; padding:8px 10px; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); font-weight:700; }
+  .rev-table td { padding:10px; border-bottom:1px solid var(--border); }
+  .rev-table tr:hover td { background:var(--surface2); }
+  .rev-actions { display:flex; gap:4px; }
+  .rev-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:3px 9px; border-radius:5px; font-size:11px; cursor:pointer; font-family:'DM Mono',monospace; }
+  .rev-btn:hover { color:var(--ink); border-color:var(--accent); }
+  .rev-btn.approve:hover { color:#22c55e; border-color:#22c55e; }
+  .rev-btn.flag:hover { color:#ef4444; border-color:#ef4444; }
+
+  .audit-feed { max-height:520px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+  .audit-row { display:grid; grid-template-columns:90px 1fr auto; gap:12px; padding:10px 12px; background:var(--surface2); border-radius:6px; font-size:12px; align-items:center; }
+  .audit-row .audit-when { color:var(--muted); font-family:'DM Mono',monospace; font-size:10px; }
+  .audit-row .audit-msg  { color:var(--ink); }
+  .audit-row .audit-actor { color:var(--muted); font-family:'DM Mono',monospace; font-size:10px; padding:2px 6px; background:var(--surface3); border-radius:4px; }
+  .audit-row.flagged { border-left:3px solid #ef4444; }
+  .audit-row.escalation { border-left:3px solid #d4af37; }
+  .audit-row.bsv-anchor { border-left:3px solid #f7931a; }
+
+  .escal-tree { display:flex; flex-direction:column; gap:6px; }
+  .escal-node { display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:10px 12px; background:var(--surface2); border-radius:6px; font-size:12px; align-items:center; }
+  .escal-node .escal-glyph { font-family:'DM Mono',monospace; color:var(--muted); }
+  .escal-node.active { background:rgba(212,175,55,.12); border:1px solid #d4af37; }
+  .escal-node.resolved { opacity:.55; }
+
+  .stat-block { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:18px; }
+  .stat-block .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; }
+  .stat-card .stat-label { font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-family:'DM Mono',monospace; margin-bottom:6px; }
+  .stat-card .stat-value { font-size:22px; font-weight:700; color:var(--ink); }
+  .stat-card .stat-sub   { font-size:11px; color:var(--muted); margin-top:3px; }
+
+  .reviewer-bar { display:flex; gap:6px; flex-wrap:wrap; }
+  .reviewer-chip { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:11px; font-family:'DM Mono',monospace; background:var(--surface3); color:var(--muted); }
+  .reviewer-chip.approved { background:rgba(58,154,114,.18); color:#22c55e; }
+  .reviewer-chip.flagged { background:rgba(200,74,74,.18); color:#ef4444; }
+  .reviewer-chip.pending { background:rgba(200,126,58,.12); color:#c87e3a; }
+
+  .bsv-btn { background:#f7931a; color:#fff; border:none; padding:5px 11px; border-radius:5px; font-size:11px; cursor:pointer; font-weight:600; }
+  .bsv-btn:hover { filter:brightness(1.05); }
+  .bsv-btn:disabled { opacity:.4; cursor:not-allowed; }
+</style>
+
+<!-- Page: Reviewers -->
+<div class="page gov-pages" id="page-reviewers">
+  <div class="page-gov">
+    <div class="page-header" style="margin-bottom:20px">
+      <h1 class="page-title">Reviewer Console</h1>
+      <div class="page-sub">Sign-offs across active items · drag the chip to flag · click "review" to open the deal</div>
+    </div>
+    <div class="stat-block" id="rev-stats"></div>
+    <div class="gov-card">
+      <h3>Active items awaiting sign-off</h3>
+      <div id="rev-table-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Page: Audit Trail -->
+<div class="page gov-pages" id="page-audit">
+  <div class="page-gov">
+    <div class="page-header" style="margin-bottom:20px">
+      <h1 class="page-title">Audit Trail</h1>
+      <div class="page-sub">Every reviewer decision · every agent recommendation · every escalation · with optional BSV anchor</div>
+    </div>
+    <div class="stat-block" id="audit-stats"></div>
+    <div class="gov-card">
+      <h3>Event feed</h3>
+      <div class="audit-feed" id="audit-feed"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Page: Escalation -->
+<div class="page gov-pages" id="page-escalation">
+  <div class="page-gov">
+    <div class="page-header" style="margin-bottom:20px">
+      <h1 class="page-title">Escalation Tree</h1>
+      <div class="page-sub">When reviewers disagree · ambiguity flags · what's parked, who's chasing</div>
+    </div>
+    <div class="stat-block" id="escal-stats"></div>
+    <div class="gov-grid">
+      <div class="gov-card">
+        <h3>Active escalations</h3>
+        <div class="escal-tree" id="escal-active"></div>
+      </div>
+      <div class="gov-card">
+        <h3>Escalation rules</h3>
+        <div id="escal-rules"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function governanceOverlay() {
+  // Wait for the master to boot
+  function whenReady(cb) {
+    if (window.DB && window.showPage) cb();
+    else setTimeout(function(){ whenReady(cb); }, 50);
+  }
+
+  whenReady(function(){
+    if (!document.body.classList.contains('workflow-governance')) return;
+
+    // 1. Extend DB with governance state
+    if (!window.DB.reviewers)   window.DB.reviewers   = window.GOV_SEED?.reviewers   || [];
+    if (!window.DB.audit_log)   window.DB.audit_log   = window.GOV_SEED?.audit_log   || [];
+    if (!window.DB.escalations) window.DB.escalations = window.GOV_SEED?.escalations || [];
+    if (!window.DB.escalation_rules) window.DB.escalation_rules = window.GOV_SEED?.escalation_rules || [];
+    if (!window.DB.signoffs)    window.DB.signoffs    = window.GOV_SEED?.signoffs    || {}; // dealId -> { reviewerId: 'approved'|'flagged'|'pending' }
+
+    // 1b. Override master DB.deals + pipeline stages with client-specific seed
+    var hasOverridden = false;
+    try { hasOverridden = !!localStorage.getItem(NODE.id + '_seed_applied'); } catch(_){}
+    if (window.GOV_SEED?.seed_deals && !hasOverridden) {
+      window.DB.deals = window.GOV_SEED.seed_deals;
+    }
+    if (window.GOV_SEED?.pipeline_stages && !hasOverridden) {
+      window.DB.settings = window.DB.settings || {};
+      window.DB.settings.stages = window.GOV_SEED.pipeline_stages;
+    }
+    if (!hasOverridden) {
+      try { localStorage.setItem(NODE.id + '_seed_applied', '1'); } catch(_){}
+      // Force a re-render of master views now that deals + stages changed
+      ['renderDashboard','renderPipeline','renderContacts','renderActivities'].forEach(function(fn){
+        if (typeof window[fn] === 'function') { try { window[fn](); } catch(_){} }
+      });
+    }
+
+    // 2. Persist helper
+    function persist() { try { localStorage.setItem('fallforce_db', JSON.stringify(window.DB)); } catch(_){} }
+
+    // 3. Render Reviewer Console
+    function renderReviewers() {
+      var active = (window.DB.deals || []).filter(function(d){
+        return d.stage !== 'Awarded' && d.stage !== 'Audit Cleared' && d.stage !== 'Cancelled';
+      });
+      var revs = window.DB.reviewers;
+      var sums = { awaiting:0, approved:0, flagged:0, escalated:0 };
+      active.forEach(function(d){
+        var s = window.DB.signoffs[d.id] || {};
+        revs.forEach(function(r){
+          var st = s[r.id] || 'pending';
+          if (st === 'pending') sums.awaiting++;
+          else if (st === 'approved') sums.approved++;
+          else if (st === 'flagged') sums.flagged++;
+        });
+      });
+      sums.escalated = (window.DB.escalations || []).filter(function(e){ return !e.resolved; }).length;
+
+      var statEl = document.getElementById('rev-stats');
+      statEl.innerHTML =
+        '<div class="stat-card"><div class="stat-label">Awaiting</div><div class="stat-value">'+sums.awaiting+'</div><div class="stat-sub">sign-offs open</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color:#22c55e">'+sums.approved+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Flagged</div><div class="stat-value" style="color:#ef4444">'+sums.flagged+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Escalated</div><div class="stat-value" style="color:#d4af37">'+sums.escalated+'</div></div>';
+
+      var rows = active.map(function(d){
+        var s = window.DB.signoffs[d.id] || {};
+        var chips = revs.map(function(r){
+          var st = s[r.id] || 'pending';
+          var cls = st === 'approved' ? 'approved' : st === 'flagged' ? 'flagged' : 'pending';
+          var glyph = st === 'approved' ? '✓' : st === 'flagged' ? '✗' : '○';
+          return '<button class="reviewer-chip '+cls+'" title="'+esc(r.name)+' · '+esc(r.role)+' · click to cycle" onclick="window.gov.cycleSignoff(\''+d.id+'\',\''+r.id+'\')">'+glyph+' '+esc(r.short || r.name)+'</button>';
+        }).join('');
+        var flags = Object.values(s).filter(function(x){ return x === 'flagged'; }).length;
+        var stageTag = '<span class="gov-tag '+(flags>0?'no':sums.escalated?'escal':'wait')+'">'+esc(d.stage)+'</span>';
+        return '<tr>' +
+          '<td><strong>'+esc(d.name)+'</strong><div style="font-size:11px;color:var(--muted)">'+esc(d.company)+' · £'+(d.value||0).toLocaleString()+'</div></td>' +
+          '<td>'+stageTag+'</td>' +
+          '<td><div class="reviewer-bar">'+chips+'</div></td>' +
+          '<td><div class="rev-actions"><button class="rev-btn approve" onclick="window.gov.approveAll(\''+d.id+'\')">approve all</button><button class="rev-btn flag" onclick="window.gov.escalate(\''+d.id+'\')">escalate</button></div></td>' +
+        '</tr>';
+      }).join('');
+      document.getElementById('rev-table-wrap').innerHTML =
+        '<table class="rev-table"><thead><tr><th>Item</th><th>Stage</th><th>Reviewers</th><th>Action</th></tr></thead><tbody>' +
+        (rows || '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted)">No active items.</td></tr>') +
+        '</tbody></table>';
+    }
+
+    // 4. Render Audit Trail
+    function renderAudit() {
+      var log = (window.DB.audit_log || []).slice().sort(function(a,b){ return b.ts - a.ts; });
+      var sums = {
+        events: log.length,
+        flagged: log.filter(function(e){ return e.kind === 'flag'; }).length,
+        approvals: log.filter(function(e){ return e.kind === 'approve'; }).length,
+        anchored: log.filter(function(e){ return e.bsv_tx; }).length
+      };
+      document.getElementById('audit-stats').innerHTML =
+        '<div class="stat-card"><div class="stat-label">Events</div><div class="stat-value">'+sums.events+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Approvals</div><div class="stat-value" style="color:#22c55e">'+sums.approvals+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Flags</div><div class="stat-value" style="color:#ef4444">'+sums.flagged+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">BSV-anchored</div><div class="stat-value" style="color:#f7931a">'+sums.anchored+'</div><div class="stat-sub">on-chain audit</div></div>';
+
+      var feed = log.slice(0, 200).map(function(e){
+        var when = new Date(e.ts).toLocaleString();
+        var cls = '';
+        if (e.kind === 'flag') cls = 'flagged';
+        else if (e.kind === 'escalation') cls = 'escalation';
+        else if (e.bsv_tx) cls = 'bsv-anchor';
+        var anchorBtn = !e.bsv_tx
+          ? '<button class="bsv-btn" onclick="window.gov.anchor(\''+e.id+'\')" title="Anchor this event to BSV (≈20 $KONO via OnlyBrains)">⚓ anchor</button>'
+          : '<a href="#" class="audit-actor" title="BSV tx (mock)">tx '+(e.bsv_tx || '').slice(0, 10)+'…</a>';
+        return '<div class="audit-row '+cls+'">' +
+          '<div class="audit-when">'+when+'</div>' +
+          '<div class="audit-msg"><strong>'+esc(e.actor || 'system')+'</strong> · '+esc(e.message)+(e.deal?' <span style="color:var(--muted)">on '+esc(e.deal)+'</span>':'')+'</div>' +
+          anchorBtn +
+        '</div>';
+      }).join('');
+      document.getElementById('audit-feed').innerHTML = feed || '<div style="text-align:center;color:var(--muted);padding:24px">No events yet.</div>';
+    }
+
+    // 5. Render Escalation Tree
+    function renderEscalation() {
+      var actives = (window.DB.escalations || []).filter(function(e){ return !e.resolved; });
+      var resolved = (window.DB.escalations || []).filter(function(e){ return e.resolved; });
+      document.getElementById('escal-stats').innerHTML =
+        '<div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" style="color:#d4af37">'+actives.length+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Resolved</div><div class="stat-value" style="color:#22c55e">'+resolved.length+'</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Avg time-to-resolve</div><div class="stat-value">'+computeAvgResolveTime()+'</div><div class="stat-sub">hours</div></div>' +
+        '<div class="stat-card"><div class="stat-label">Rules</div><div class="stat-value">'+(window.DB.escalation_rules || []).length+'</div><div class="stat-sub">configured</div></div>';
+      document.getElementById('escal-active').innerHTML = actives.map(function(e){
+        return '<div class="escal-node active"><div class="escal-glyph">▲</div><div><strong>'+esc(e.title)+'</strong><div style="font-size:11px;color:var(--muted)">opened '+new Date(e.opened_at).toLocaleString()+' · '+esc(e.reason || '')+'</div></div><button class="rev-btn approve" onclick="window.gov.resolveEscalation(\''+e.id+'\')">resolve</button></div>';
+      }).join('') || '<div style="color:var(--muted);font-size:12px">No active escalations.</div>';
+      document.getElementById('escal-rules').innerHTML = (window.DB.escalation_rules || []).map(function(r){
+        return '<div style="padding:10px;background:var(--surface2);border-radius:6px;font-size:12px;margin-bottom:6px"><strong>'+esc(r.when)+'</strong><div style="color:var(--muted);font-size:11px;margin-top:3px">→ '+esc(r.then)+'</div></div>';
+      }).join('') || '<div style="color:var(--muted);font-size:12px">No rules configured.</div>';
+    }
+
+    function computeAvgResolveTime() {
+      var rs = (window.DB.escalations || []).filter(function(e){ return e.resolved && e.opened_at && e.resolved_at; });
+      if (!rs.length) return '—';
+      var avg = rs.reduce(function(a,e){ return a + (e.resolved_at - e.opened_at); }, 0) / rs.length;
+      return (avg / 3600000).toFixed(1);
+    }
+
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+    // 6. Actions
+    function logAudit(actor, message, deal, kind) {
+      window.DB.audit_log = window.DB.audit_log || [];
+      var ev = { id: 'ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), ts: Date.now(), actor: actor, message: message, deal: deal || null, kind: kind || 'note' };
+      window.DB.audit_log.unshift(ev);
+      if (window.DB.audit_log.length > 2000) window.DB.audit_log.length = 2000;
+      persist();
+      if (window.kcc) {
+        var ring = kind === 'flag' ? 2 : kind === 'approve' ? 5 : kind === 'escalation' ? 6 : 1;
+        window.kcc.emit('audit:' + kind, ring, 1, { actor: actor });
+      }
+      return ev;
+    }
+
+    window.gov = {
+      cycleSignoff: function(dealId, reviewerId) {
+        var s = window.DB.signoffs[dealId] || (window.DB.signoffs[dealId] = {});
+        var cur = s[reviewerId] || 'pending';
+        var next = cur === 'pending' ? 'approved' : cur === 'approved' ? 'flagged' : 'pending';
+        s[reviewerId] = next;
+        var reviewer = (window.DB.reviewers.find(function(r){ return r.id === reviewerId; }) || {}).name || reviewerId;
+        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || {}).name || dealId;
+        logAudit(reviewer, next + ' (' + cur + ' → ' + next + ')', deal, next === 'approved' ? 'approve' : next === 'flagged' ? 'flag' : 'note');
+        // Auto-escalate if 2+ flags on the same deal
+        var flags = Object.values(s).filter(function(x){ return x === 'flagged'; }).length;
+        if (flags >= 2) {
+          var exists = window.DB.escalations.find(function(e){ return e.deal_id === dealId && !e.resolved; });
+          if (!exists) {
+            window.DB.escalations.push({ id:'esc_'+Date.now(), deal_id:dealId, title:'Reviewer disagreement · ' + deal, opened_at:Date.now(), resolved:false, reason: flags + ' reviewers flagged' });
+            logAudit('system', 'Auto-escalated · ' + flags + ' reviewer flags', deal, 'escalation');
+          }
+        }
+        persist();
+        renderReviewers(); renderAudit(); renderEscalation();
+      },
+      approveAll: function(dealId) {
+        var s = window.DB.signoffs[dealId] || (window.DB.signoffs[dealId] = {});
+        window.DB.reviewers.forEach(function(r){ s[r.id] = 'approved'; });
+        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || {}).name || dealId;
+        logAudit('procurement-lead', 'Approve-all on ' + deal, deal, 'approve');
+        persist();
+        renderReviewers(); renderAudit();
+      },
+      escalate: function(dealId) {
+        var deal = (window.DB.deals.find(function(d){ return d.id === dealId; }) || {}).name || dealId;
+        var reason = prompt('Escalation reason for ' + deal, '');
+        if (reason === null) return;
+        window.DB.escalations.push({ id:'esc_'+Date.now(), deal_id:dealId, title:'Manual escalation · ' + deal, opened_at:Date.now(), resolved:false, reason: reason || 'no reason given' });
+        logAudit('procurement-lead', 'Manually escalated · ' + (reason || 'no reason'), deal, 'escalation');
+        persist();
+        renderReviewers(); renderAudit(); renderEscalation();
+      },
+      resolveEscalation: function(escId) {
+        var e = window.DB.escalations.find(function(x){ return x.id === escId; });
+        if (!e) return;
+        var note = prompt('Resolution note', '');
+        if (note === null) return;
+        e.resolved = true;
+        e.resolved_at = Date.now();
+        e.resolution = note;
+        logAudit('procurement-lead', 'Resolved escalation · ' + (note || ''), e.title, 'note');
+        persist();
+        renderEscalation(); renderAudit();
+      },
+      anchor: function(eventId) {
+        if (!window.kcc || !window.kcc.anchor) {
+          alert('OnlyBrains KCC not loaded yet.');
+          return;
+        }
+        var e = (window.DB.audit_log || []).find(function(x){ return x.id === eventId; });
+        if (!e) return;
+        e.bsv_tx = 'pending';
+        renderAudit();
+        window.kcc.anchor('STATE', { equip: 'audit-' + eventId, from: 'logged', to: 'anchored', mode: 'manual', message: e.message, actor: e.actor, ts: e.ts }).then(function(r){
+          if (r && !r.error && r.tx) {
+            e.bsv_tx = r.tx;
+          } else if (r && !r.error) {
+            // Use placeholder hash if API returned without tx but no error
+            e.bsv_tx = 'anchor_' + Date.now().toString(16);
+          } else {
+            delete e.bsv_tx;
+            alert('Anchor failed: ' + (r && r.error || 'unknown'));
+          }
+          persist();
+          renderAudit();
+        });
+      }
+    };
+
+    // 7. Register pages with the master router
+    var origShowPage = window.showPage;
+    window.showPage = function(name) {
+      var govPage = document.getElementById('page-' + name);
+      if (govPage && govPage.classList.contains('gov-pages')) {
+        // Hide ALL pages (master + gov), clear any inline display styles set previously
+        document.querySelectorAll('.page').forEach(function(el){
+          el.classList.remove('active');
+          el.style.removeProperty('display');
+        });
+        govPage.classList.add('active');
+        // Don't set inline display — rely on .page.active CSS rule
+        if (name === 'reviewers') renderReviewers();
+        else if (name === 'audit') renderAudit();
+        else if (name === 'escalation') renderEscalation();
+        document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+        var nav = document.getElementById('nav-' + name);
+        if (nav) nav.classList.add('active');
+        return;
+      }
+      // Switching to a master page — clear any sticky gov inline styles
+      document.querySelectorAll('.gov-pages').forEach(function(el){
+        el.classList.remove('active');
+        el.style.removeProperty('display');
+      });
+      return origShowPage.apply(this, arguments);
+    };
+
+    // 8. Inject nav items
+    function injectNavItems() {
+      // pipelineNav is the anchor — insert after it inside ITS OWN parent
+      // (sidebar has section groupings, so nav-dashboard.parent ≠ nav-pipeline.parent)
+      var pipelineNav = document.getElementById('nav-pipeline');
+      if (!pipelineNav) return;
+      var parent = pipelineNav.parentNode;
+      var insertAfter = pipelineNav.nextSibling; // sibling of pipeline within same parent
+      function makeItem(id, label, glyph) {
+        if (document.getElementById('nav-' + id)) return null;
+        var btn = document.createElement('button');
+        btn.className = 'nav-item';
+        btn.id = 'nav-' + id;
+        btn.onclick = function(){ window.showPage(id); };
+        btn.innerHTML = '<span class="nav-icon">' + glyph + '</span><span class="nav-text">' + label + '</span>';
+        return btn;
+      }
+      [['reviewers','Reviewers','◑'], ['audit','Audit Trail','▦'], ['escalation','Escalation','▲']].forEach(function(spec){
+        var item = makeItem(spec[0], spec[1], spec[2]);
+        if (item) parent.insertBefore(item, insertAfter);
+      });
+    }
+
+    injectNavItems();
+    if (window.kcc) window.kcc.emit('governance:overlay_loaded', 4, 1);
+    try { console.log('%c◊ Governance overlay loaded', 'color:#d4af37;font-weight:bold', 'Reviewers + Audit + Escalation'); } catch(_){}
+  });
+})();
+</script>
+<!-- /◊ GOVERNANCE OVERLAY -->

@@ -1,0 +1,28 @@
+{
+  "client_name": "Acme Procurement",
+  "slug": "acme-procurement",
+  "product_name": "AcmeOps",
+  "client_logo_text": "Acme",
+  "tagline": "Sovereign procurement governance — your reviewers, your audit trail.",
+  "trial_days": 30,
+  "konomi_visible": true,
+  "workflow": "procurement",
+  "brand": {
+    "accent": "#5078DC",
+    "accent_dim": "rgba(80,120,220,0.18)"
+  },
+  "pipeline_stages": [
+    "RFQ Drafted",
+    "Suppliers Shortlisted",
+    "Bids Received",
+    "Bid Review",
+    "Awarded",
+    "Contract Issued",
+    "Delivered",
+    "Audit Cleared"
+  ],
+  "reviewers": [],
+  "escalation_rules": [],
+  "seed_deals": [],
+  "audit_log": []
+}
