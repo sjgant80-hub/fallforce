@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FallForce Forge · Build a per-client sovereign CRM</title>
+<meta name="description" content="In-browser builder. Fill in the client's specs, click BUILD, download a fully-configured sovereign FallForce CRM with a signed 14-day trial.">
+<style>
+:root{
+  --bg:#0a0e1a; --surface:#10162a; --surface-2:#1a2240;
+  --border:#1f2a4a; --accent:#5078DC; --accent-dim:rgba(80,120,220,0.18);
+  --text:#e8eaf0; --text-mid:#a0a8c0; --text-dim:#6b748a;
+  --green:#3dd17b; --red:#e53e3e; --orange:#e8732a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.55;min-height:100vh}
+header{background:var(--surface);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:14px}
+header .logo{font-size:18px;font-weight:800;letter-spacing:1px}
+header .logo .dot{color:var(--accent)}
+header .signer{font-size:11px;letter-spacing:1px;color:var(--text-mid);display:flex;align-items:center;gap:8px}
+header .signer .pulse{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block}
+header .signer .pulse.live{background:var(--green);box-shadow:0 0 6px var(--green)}
+.wrap{max-width:920px;margin:0 auto;padding:32px}
+h1{font-size:28px;margin-bottom:6px}
+.lede{color:var(--text-mid);margin-bottom:22px;font-size:15px}
+.note{background:var(--accent-dim);border-left:3px solid var(--accent);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--text)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:24px;margin-bottom:18px}
+.panel h2{font-size:13px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:8px}
+label{display:block;font-size:11px;letter-spacing:1px;color:var(--text-mid);text-transform:uppercase;margin-bottom:4px;font-weight:600}
+input[type=text],input[type=email],input[type=url],input[type=tel],input[type=date],input[type=number],input[type=color],select,textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:14px;color:var(--text);background:var(--surface-2)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+input[type=color]{padding:3px;height:38px}
+textarea{min-height:80px;resize:vertical;font-family:'DM Mono',monospace;font-size:12px}
+.row-hint{font-size:11px;color:var(--text-dim);margin-top:3px}
+.toggle{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;cursor:pointer}
+.toggle input{width:auto;margin:0;margin-top:3px}
+.toggle .lbl{font-size:13px;font-weight:600}
+.toggle .desc{font-size:11px;color:var(--text-dim);margin-top:2px;line-height:1.5}
+.cta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:18px}
+button.go{background:var(--accent);color:#fff;border:none;padding:14px 28px;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-radius:4px;cursor:pointer;box-shadow:0 2px 8px rgba(80,120,220,0.3)}
+button.go:hover{background:#6088ec}
+button.go:disabled{opacity:0.5;cursor:not-allowed}
+button.dim{background:var(--surface-2);color:var(--text);border:1px solid var(--border);padding:14px 22px;font-family:inherit;font-size:13px;letter-spacing:1px;border-radius:4px;cursor:pointer}
+button.dim:hover{background:var(--border)}
+.status{margin-top:14px;font-size:13px;color:var(--text-mid);min-height:20px;line-height:1.6}
+.status.ok{color:var(--green);font-weight:600}
+.status.err{color:var(--red);font-weight:600}
+.status.warn{color:var(--orange);font-weight:600}
+.summary{margin-top:18px;padding:18px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;font-family:'DM Mono',ui-monospace,Consolas,monospace;font-size:12px;line-height:1.7;display:none;white-space:pre-wrap}
+.summary.visible{display:block}
+.summary .k{color:var(--accent);font-weight:600}
+.signer-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.signer-card .left{font-size:13px;color:var(--text-mid)}
+.signer-card .left strong{color:var(--text)}
+.signer-card button.recheck{background:var(--accent);color:#fff;border:none;padding:9px 16px;font-size:12px;font-family:inherit;letter-spacing:1px;cursor:pointer;border-radius:4px}
+footer{margin-top:48px;padding:24px;text-align:center;color:var(--text-dim);font-size:12px;border-top:1px solid var(--border)}
+@media(max-width:680px){.wrap{padding:18px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Fall<span class="dot">Force</span> · Forge</div>
+  <div class="signer">
+    <span id="signerPulse" class="pulse"></span>
+    <span id="signerStatus">signer · checking…</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h1>Build a sovereign CRM for a client</h1>
+<p class="lede">Fill in the client's specs. Click <strong>BUILD &amp; DOWNLOAD</strong>. Your browser fetches the master, requests a 14-day Konomi-signed trial from your local signer, embeds it, and downloads a single production HTML you hand to the client.</p>
+
+<div class="signer-card">
+  <div class="left">
+    <strong>Local trial-signer</strong>
+    <div id="signerInfo">checking <span style="font-family:'DM Mono',monospace">127.0.0.1:9991</span> …</div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:3px">Start via: <code style="background:var(--surface-2);padding:1px 6px;border-radius:3px">node trial-sign-server.mjs</code> (clone <a href="https://github.com/sjgant80-hub/konomi-signer" style="color:var(--accent)">konomi-signer</a> repo if you don't have it)</div>
+  </div>
+  <button class="recheck" id="recheckBtn">re-check</button>
+</div>
+
+<form id="forge">
+
+<div class="panel">
+<h2>The client · identity &amp; positioning</h2>
+<div class="grid">
+  <div>
+    <label for="client_name">Client name *</label>
+    <input type="text" id="client_name" placeholder="Acme Procurement Ltd" required>
+  </div>
+  <div>
+    <label for="slug">Slug (auto · or override)</label>
+    <input type="text" id="slug" placeholder="acme-procurement">
+    <div class="row-hint">a-z, 0-9, hyphens · used as filename and tool_id</div>
+  </div>
+</div>
+<div class="grid">
+  <div>
+    <label for="product_name">Product name shown in UI</label>
+    <input type="text" id="product_name" value="FallForce" placeholder="AcmeOps or your white-label name">
+  </div>
+  <div>
+    <label for="client_logo_text">Logo text (sidebar top)</label>
+    <input type="text" id="client_logo_text" placeholder="Acme">
+  </div>
+</div>
+<div>
+  <label for="tagline">Tagline (meta description)</label>
+  <input type="text" id="tagline" placeholder="Sovereign procurement governance · your reviewers · your audit trail.">
+</div>
+<div class="grid">
+  <div>
+    <label for="workflow">Workflow type</label>
+    <select id="workflow">
+      <option value="crm">CRM · standard sales pipeline</option>
+      <option value="procurement">Procurement · RFQ → contract → audit</option>
+      <option value="recruitment">Recruitment · candidate → hire</option>
+      <option value="legal">Legal · matter → close</option>
+      <option value="custom">Custom (set pipeline stages below)</option>
+    </select>
+  </div>
+  <div>
+    <label>Trial length</label>
+    <select id="trial_days">
+      <option value="14" selected>14 days (standard)</option>
+      <option value="30">30 days (extended)</option>
+      <option value="7">7 days (short)</option>
+      <option value="60">60 days (enterprise pilot)</option>
+    </select>
+  </div>
+</div>
+<div>
+  <label for="pipeline_stages">Pipeline stages (one per line · ordered)</label>
+  <textarea id="pipeline_stages" placeholder="Lead&#10;Qualified&#10;Proposal&#10;Negotiation&#10;Closed Won">RFQ Drafted
+Suppliers Shortlisted
+Bids Received
+Bid Review
+Awarded
+Contract Issued
+Delivered
+Audit Cleared</textarea>
+  <div class="row-hint">Defaults to procurement · edit to match the client's actual process</div>
+</div>
+</div>
+
+<div class="panel">
+<h2>Brand colours</h2>
+<div class="grid">
+  <div>
+    <label>Accent (buttons / highlights)</label>
+    <input type="color" id="brand_accent" value="#5078DC">
+  </div>
+  <div>
+    <label>Accent dim (subtle backgrounds)</label>
+    <input type="color" id="brand_accent_dim" value="#0d1a3b">
+    <div class="row-hint">Will be rendered as rgba with 0.18 alpha</div>
+  </div>
+</div>
+</div>
+
+<div class="panel">
+<h2>Konomi visibility · professionalism</h2>
+<label class="toggle">
+  <input type="checkbox" id="konomi_hide" checked>
+  <div>
+    <div class="lbl">Hide Konomi / KCC badges on the client's build</div>
+    <div class="desc">Recommended for client-facing deliveries. Badges are CSS-hidden so the client sees a clean professional surface. The shim code, ledger, and bloom hooks remain in the file — flip the flag and rebuild later if the client opts into the Konomi protocol layer.</div>
+  </div>
+</label>
+</div>
+
+<div class="cta">
+<button type="button" class="go" id="buildBtn">◊ BUILD &amp; DOWNLOAD</button>
+<button type="button" class="dim" id="previewBtn">PREVIEW SPECS</button>
+<button type="button" class="dim" id="resetBtn">RESET</button>
+</div>
+<div class="status" id="status">Awaiting specs · trial-signer status above ↑</div>
+<pre class="summary" id="summary"></pre>
+
+</form>
+
+<footer>
+◊·κ=1 · FallForce · Sovereign CRM · MIT · prime 709 + per-client extension prime<br>
+master · <a href="./" style="color:var(--accent)">/index.html</a> &nbsp; · &nbsp; <a href="https://github.com/sjgant80-hub/fallforce" style="color:var(--accent)">sjgant80-hub/fallforce</a> &nbsp; · &nbsp; <a href="https://www.ai-nativesolutions.com" style="color:var(--accent)">AI Native Solutions</a><br>
+<span style="color:var(--text-dim)">Follows the <a href="https://github.com/sjgant80-hub/si-didy-agent/blob/main/ESTATE-PRODUCT-DOCTRINE.md" style="color:var(--accent)">Estate Product Doctrine</a></span>
+</footer>
+
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const SIGNER_URL = 'http://127.0.0.1:9991';
+const PRIME_POOL = [149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277];
+
+function hashSlug(s) { let h = 0; for (const c of s) { h = (h*31 + c.charCodeAt(0)) >>> 0; } return h; }
+function pickPrime(slug) { return PRIME_POOL[hashSlug(slug) % PRIME_POOL.length]; }
+function slugify(s) { return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0,32); }
+function esc(s) { return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function hexToRgba(hex, a) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  return 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')';
+}
+
+let signerReady = false;
+async function checkSigner() {
+  try {
+    const r = await fetch(SIGNER_URL + '/health', { signal: AbortSignal.timeout(2000) });
+    const j = await r.json();
+    if (j.ok && j.ready) {
+      signerReady = true;
+      $('#signerPulse').classList.add('live');
+      $('#signerStatus').textContent = 'signer · ready';
+      $('#signerInfo').innerHTML = '<span style="color:var(--green);font-weight:600">✓ signer ready · 14-day trials will be Konomi-signed before download</span>';
+      $('#status').className = 'status ok';
+      $('#status').textContent = '◊ signer ready · fill specs above · BUILD when ready';
+      return true;
+    }
+  } catch (_) {}
+  signerReady = false;
+  $('#signerPulse').classList.remove('live');
+  $('#signerStatus').textContent = 'signer · offline';
+  $('#signerInfo').innerHTML = '<span style="color:var(--red);font-weight:600">✗ signer not reachable at 127.0.0.1:9991</span>';
+  $('#status').className = 'status warn';
+  $('#status').textContent = '⚠ build will be REJECTED until signer is reachable · production discipline';
+  return false;
+}
+$('#recheckBtn').onclick = checkSigner;
+checkSigner();
+setInterval(checkSigner, 8000);
+
+$('#client_name').addEventListener('input', e => {
+  if (!$('#slug').dataset.touched) $('#slug').value = slugify(e.target.value);
+});
+$('#slug').addEventListener('input', () => $('#slug').dataset.touched = '1');
+
+function collectConfig() {
+  const stages = $('#pipeline_stages').value.split('\n').map(s => s.trim()).filter(Boolean);
+  return {
+    client_name:      $('#client_name').value.trim(),
+    slug:             $('#slug').value.trim() || slugify($('#client_name').value),
+    product_name:     $('#product_name').value.trim() || 'FallForce',
+    client_logo_text: $('#client_logo_text').value.trim() || $('#client_name').value.trim(),
+    tagline:          $('#tagline').value.trim(),
+    workflow:         $('#workflow').value,
+    trial_days:       parseInt($('#trial_days').value, 10) || 14,
+    konomi_visible:   !$('#konomi_hide').checked,
+    brand: {
+      accent:     $('#brand_accent').value,
+      accent_dim: hexToRgba($('#brand_accent_dim').value, 0.18),
+    },
+    pipeline_stages: stages.length ? stages : null,
+  };
+}
+
+async function signTrial(cfg, slug, prime) {
+  const r = await fetch(SIGNER_URL + '/sign-trial', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      tool_id: slug,
+      tool_prime: prime,
+      gym_name: cfg.client_name,
+      days: cfg.trial_days,
+    }),
+  });
+  if (!r.ok) throw new Error('signer rejected · HTTP ' + r.status);
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'signing failed');
+  return j;
+}
+
+function patchHtml(html, cfg, slug, prime, trialEnvelope, trialMeta) {
+  // 1) title + meta
+  html = html.replace(/<title>[^<]*<\/title>/i, `<title>${esc(cfg.client_name)} · ${esc(cfg.product_name)}</title>`);
+  if (cfg.tagline) {
+    if (/<meta name="description"[^>]*>/i.test(html)) {
+      html = html.replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${esc(cfg.tagline)}">`);
+    } else {
+      html = html.replace('</head>', `<meta name="description" content="${esc(cfg.tagline)}">\n</head>`);
+    }
+  }
+
+  // 2) NODE override
+  const nodeBlock = `
+  window.NODE = {
+    id: '${slug}',
+    name: ${JSON.stringify(cfg.client_name)},
+    prime: ${prime},
+    layers: 7,
+    built: '${new Date().toISOString().slice(0,10)}',
+    branded_by: 'fallforce-forge',
+    master_prime: 709,
+    workflow: ${JSON.stringify(cfg.workflow || 'crm')}
+  };`;
+  if (/window\.NODE\s*=\s*\{[\s\S]*?\};/.test(html)) {
+    html = html.replace(/window\.NODE\s*=\s*\{[\s\S]*?\};/, nodeBlock);
+  } else {
+    html = html.replace(/<!-- ◊·κ FALLMESH SHIM/, `<script>${nodeBlock}<\/script>\n<!-- ◊·κ FALLMESH SHIM`);
+  }
+
+  // 3) brand overrides
+  const tokens = [];
+  if (cfg.brand.accent)     tokens.push(`--accent: ${cfg.brand.accent};`);
+  if (cfg.brand.accent_dim) tokens.push(`--accent-dim: ${cfg.brand.accent_dim};`);
+  if (tokens.length) {
+    html = html.replace('</style>', `\n/* per-client brand override · ${esc(cfg.client_name)} */\n:root { ${tokens.join(' ')} }\n</style>`);
+  }
+
+  // 4) nav logo replacements
+  if (cfg.client_logo_text) {
+    html = html.replace(/FallCRM<\/strong>/g, esc(cfg.client_logo_text) + '</strong>');
+    html = html.replace(/>FC<\/(\w+)>/g, '>' + esc(cfg.client_logo_text.slice(0,2).toUpperCase()) + '</$1>');
+  }
+
+  // 5) product name swap
+  if (cfg.product_name && cfg.product_name !== 'FallForce') {
+    html = html.replace(/FallCRM Elite/g, esc(cfg.product_name));
+    html = html.replace(/\bFallForce\b/g, esc(cfg.product_name));
+  }
+
+  // 6) Konomi hide
+  if (cfg.konomi_visible === false) {
+    html = html.replace('</style>',
+      `\n/* per-client build: Konomi/KCC badges hidden · shim code preserved */\n#kcc-badge,#konomi-badge{display:none !important;}\n</style>`);
+  }
+
+  // 7) pipeline stages
+  if (cfg.pipeline_stages && cfg.pipeline_stages.length) {
+    const stagesJSON = JSON.stringify(cfg.pipeline_stages);
+    html = html.replace(/stages:\s*\[[^\]]+\]/, `stages: ${stagesJSON}`);
+  }
+
+  // 8) signed Konomi trial
+  const licenceSeed = `
+<script>
+(function preActivate(){
+  function ap(){
+    try {
+      var k = 'konomi_licence_' + ${JSON.stringify(slug)};
+      if (localStorage.getItem(k)) return;
+      localStorage.setItem(k, ${JSON.stringify(trialEnvelope)});
+    } catch(_){}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ap, { once:true });
+  else ap();
+})();
+<\/script>`;
+  html = html.replace('</body>', licenceSeed + '\n</body>');
+
+  // 9) Manifest comment
+  const manifest = `<!--
+  ◊·κ=1 · per-client sovereign build · forged in-browser · production
+  client_name: ${cfg.client_name}
+  slug:        ${slug}
+  prime:       ${prime}
+  master:      sjgant80-hub/fallforce (prime 709)
+  workflow:    ${cfg.workflow}
+  built:       ${new Date().toISOString()}
+  konomi:      ${cfg.konomi_visible ? 'badges visible' : 'badges hidden (shim code preserved)'}
+  trial:       ${trialMeta.days} days · Konomi-signed Ed25519 · expires ${trialMeta.expires}
+  upgrade:     persistent Konomi licence available after trial
+  doctrine:    sjgant80-hub/si-didy-agent/ESTATE-PRODUCT-DOCTRINE.md
+-->\n`;
+  html = manifest + html;
+  return html;
+}
+
+async function build(){
+  const cfg = collectConfig();
+  if (!cfg.client_name) { setStatus('Enter a client name first.', 'err'); return; }
+  if (!signerReady) {
+    const ok = await checkSigner();
+    if (!ok) { setStatus('✗ signer offline. Production builds require Konomi-signed trial. Start the signer first.', 'err'); return; }
+  }
+  $('#buildBtn').disabled = true;
+  const slug = cfg.slug;
+  const prime = pickPrime(slug);
+  try {
+    setStatus('Requesting ' + cfg.trial_days + '-day Konomi-signed trial from signer…', '');
+    const trial = await signTrial(cfg, slug, prime);
+    setStatus('Fetching master template…', '');
+    const masterUrl = new URL('./index.html', location.href).href;
+    const r = await fetch(masterUrl, { cache: 'no-store' });
+    if (!r.ok) throw new Error('could not fetch master at ' + masterUrl + ' · HTTP ' + r.status);
+    let html = await r.text();
+    setStatus('Patching template (' + Math.round(html.length/1024) + ' KB)…', '');
+    html = patchHtml(html, cfg, slug, prime, trial.envelope, trial);
+    setStatus('Triggering download…', '');
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = slug + '.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    setStatus('✓ Production build delivered · ' + slug + '.html · prime ' + prime + ' · ' + Math.round(html.length/1024) + ' KB · trial signed (' + trial.days + 'd, expires ' + trial.expires.slice(0,10) + ')', 'ok');
+    renderSummary(cfg, slug, prime, trial, html.length);
+  } catch (e) {
+    setStatus('✗ ' + e.message, 'err');
+  } finally {
+    $('#buildBtn').disabled = false;
+  }
+}
+
+function setStatus(msg, cls){ const el = $('#status'); el.textContent = msg; el.className = 'status ' + (cls || ''); }
+function renderSummary(cfg, slug, prime, trial, sizeBytes){
+  const s = $('#summary');
+  s.classList.add('visible');
+  s.innerHTML = [
+    '<span class="k">FILE:</span>      ' + slug + '.html · ' + Math.round(sizeBytes/1024) + ' KB',
+    '<span class="k">PRIME:</span>     ' + prime + ' (extension of master 709)',
+    '<span class="k">CLIENT:</span>    ' + cfg.client_name,
+    '<span class="k">PRODUCT:</span>   ' + cfg.product_name,
+    '<span class="k">WORKFLOW:</span>  ' + cfg.workflow,
+    '<span class="k">STAGES:</span>    ' + (cfg.pipeline_stages ? cfg.pipeline_stages.length + ' · ' + cfg.pipeline_stages.slice(0,3).join(' → ') + (cfg.pipeline_stages.length > 3 ? ' → …' : '') : 'master defaults'),
+    '<span class="k">KONOMI:</span>    ' + (cfg.konomi_visible ? 'badges visible' : 'badges hidden · shim code preserved'),
+    '<span class="k">TRIAL:</span>     ' + trial.days + ' days · Konomi Ed25519-signed · expires ' + trial.expires,
+    '',
+    '<span class="k">DELIVERY:</span>',
+    '   1. Hand the HTML to the client (USB / email / SharePoint).',
+    '   2. They double-click to open · works from file:// · no install.',
+    '   3. Trial auto-activates · onboarding pre-fills · pipeline stages set.',
+    '   4. ' + trial.days + ' days later: in-app upgrade path to persistent Konomi licence.',
+  ].join('\n');
+}
+
+$('#buildBtn').onclick = build;
+$('#previewBtn').onclick = () => {
+  const cfg = collectConfig();
+  if (!cfg.client_name) { setStatus('Enter a client name to preview.', 'err'); return; }
+  const slug = slugify(cfg.client_name);
+  const fakeTrial = { days: cfg.trial_days, expires: new Date(Date.now() + cfg.trial_days*86400000).toISOString() };
+  renderSummary(cfg, slug, pickPrime(slug), fakeTrial, 200000);
+  setStatus('Preview only · click BUILD to mint the signed trial and download.', '');
+};
+$('#resetBtn').onclick = () => {
+  document.getElementById('forge').reset();
+  $('#summary').classList.remove('visible');
+  $('#konomi_hide').checked = true;
+  setStatus('Reset.', '');
+  checkSigner();
+};
+</script>
+
+</body>
+</html>
