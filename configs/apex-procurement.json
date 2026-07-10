@@ -29,13 +29,13 @@
   ],
   "escalation_rules": [
     { "when": "2+ reviewers flag the same item",            "then": "Auto-open escalation · notify Procurement Lead" },
-    { "when": "Item value > £250,000 and any reviewer pending >48h", "then": "Auto-escalate to Director (Sponsor sign-off required)" },
+    { "when": "Item value > TBA and any reviewer pending >48h", "then": "Auto-escalate to Director (Sponsor sign-off required)" },
     { "when": "Sole-source justification missing on award",  "then": "Block stage transition · raise Compliance flag" },
     { "when": "Single supplier in shortlist after 5 working days", "then": "Auto-escalate · request alternates" },
     { "when": "Contract terms diverge >10% from RFQ scope", "then": "Re-route to Legal · halt Award stage" }
   ],
   "seed_deals": [
-    { "id":"d1", "name":"Cloud Infrastructure Renewal (3yr)",   "contact":"c1","company":"NorthPoint Logistics", "value":485000, "stage":"Bid Review",            "probability":70, "closeDate":"2026-06-15", "status":"hot",  "notes":"3 bids received. Pricing spread 18%. Legal raised SLA concern on bid 2." },
+    { "id":"d1", "name":"Cloud Infrastructure Renewal (3yr)",   "contact":"c1","company":"NorthPoint Logistics", "value":485000, "stage":"Bid Review",            "probability":70, "closeDate":"2026-06-15", "status":"hot",  "notes":"3 bids received. Access spread 18%. Legal raised SLA concern on bid 2." },
     { "id":"d2", "name":"Industrial Robots — Line 4 Retrofit",  "contact":"c2","company":"Sterling Manufacturing","value":1240000,"stage":"Suppliers Shortlisted","probability":45, "closeDate":"2026-07-30", "status":"hot",  "notes":"Single shortlisted supplier — Procurement Lead flagged for sole-source review." },
     { "id":"d3", "name":"Annual Audit Services Contract",       "contact":"c3","company":"Vertex Holdings",      "value":78000,  "stage":"Awarded",              "probability":100,"closeDate":"2026-04-30", "status":"won",  "notes":"Awarded after 4-bid review. Compliance + Finance + Legal all approved. Contract issued." },
     { "id":"d4", "name":"PPE Quarterly Replenishment",          "contact":"c4","company":"GreenField Industries","value":42000,  "stage":"Delivered",            "probability":100,"closeDate":"2026-04-10", "status":"won",  "notes":"Standard reorder. Now awaiting audit cleared signoff." },
