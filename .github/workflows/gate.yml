@@ -1,0 +1,38 @@
+name: gate
+on: [push, workflow_dispatch]
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: proof-of-play — the number that goes to the board
+        run: node forecast.test.mjs
+
+      # ⚑ Pinned. An unpinned gate is a gate somebody else can change.
+      - name: witness — try to break the tests
+        run: |
+          git clone --depth 1 --branch v0.2 https://github.com/sjgant80-hub/witness.git /tmp/witness
+          node /tmp/witness/witness.mjs mutate forecast.mjs \
+            --cap 400 \
+            --baseline witness.forecast.baseline.json \
+            --test "node forecast.test.mjs"
+
+      - name: the shipped page still matches the gated kernel
+        run: |
+          cp index.html /tmp/shipped.html
+          node build-page.mjs
+          diff -q /tmp/shipped.html index.html || {
+            echo "::error::index.html has drifted from forecast.mjs — run build-page.mjs and commit."
+            exit 1
+          }
+
+      # ⚑ The front-page numbers must never go back to a raw reduce over unchecked data.
+      - name: no unguarded totals
+        run: |
+          grep -q 'FC.forecast' index.html || { echo '::error::the dashboard is not using the kernel'; exit 1; }
+          grep -qE 'reduce((s,ted)' index.html && { echo '::error::a raw total is back'; exit 1; }
+          grep -q 'parseInt(document.getElementById(.f-deal-value' index.html && { echo '::error::saveDeal is back on parseInt'; exit 1; }
+          echo ok
