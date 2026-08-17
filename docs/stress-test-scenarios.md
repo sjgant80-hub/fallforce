@@ -12,17 +12,17 @@ This document is a punch list. Try to break it. Tell me what breaks, what surpri
 
 | RFQ | Stage | Value | Current state |
 |---|---|---:|---|
-| Cloud Infrastructure Renewal (3yr) | Bid Review | TBAk | Comp + Fin approved, Legal flagged SLA, Proc pending |
-| Industrial Robots — Line 4 Retrofit | Suppliers Shortlisted | TBAm | Comp + Proc both flagged · auto-escalation OPEN |
-| Annual Audit Services Contract | Awarded | TBAk | All 4 reviewers approved · contract issued |
-| PPE Quarterly Replenishment | Delivered | TBAk | 3 of 4 approved, Proc pending audit clearance |
-| Specialist Consultancy — IT Strategy | Bid Review | TBAk | Fin flagged over-budget, others pending |
-| Fleet Service Contract (24mo) | Contract Issued | TBAk | Legal flagged liability clause · auto-escalation OPEN |
-| Translation Services Framework | RFQ Drafted | TBAk | Cold · awaiting Proc Lead approval |
+| Cloud Infrastructure Renewal (3yr) | Bid Review | £485k | Comp + Fin approved, Legal flagged SLA, Proc pending |
+| Industrial Robots — Line 4 Retrofit | Suppliers Shortlisted | £1.24m | Comp + Proc both flagged · auto-escalation OPEN |
+| Annual Audit Services Contract | Awarded | £78k | All 4 reviewers approved · contract issued |
+| PPE Quarterly Replenishment | Delivered | £42k | 3 of 4 approved, Proc pending audit clearance |
+| Specialist Consultancy — IT Strategy | Bid Review | £195k | Fin flagged over-budget, others pending |
+| Fleet Service Contract (24mo) | Contract Issued | £312k | Legal flagged liability clause · auto-escalation OPEN |
+| Translation Services Framework | RFQ Drafted | £58k | Cold · awaiting Proc Lead approval |
 
 **4 reviewer roles**: Compliance · Finance · Legal · Procurement Lead
 **8 procurement stages**: RFQ Drafted → Suppliers Shortlisted → Bids Received → Bid Review → Awarded → Contract Issued → Delivered → Audit Cleared
-**5 escalation rules** pre-configured (auto-escalate on 2+ flags; TBAk+ ageing items; sole-source; single-supplier shortlist; >10% scope divergence)
+**5 escalation rules** pre-configured (auto-escalate on 2+ flags; £250k+ ageing items; sole-source; single-supplier shortlist; >10% scope divergence)
 
 ---
 
@@ -51,11 +51,11 @@ What's the right next action? Options:
 
 ---
 
-## Scenario 3 · The TBAk 48-hour rule
+## Scenario 3 · The £250k 48-hour rule
 
-The escalation rule says: *"Item value > TBA AND any reviewer pending > 48h → auto-escalate to Director."*
+The escalation rule says: *"Item value > £250,000 AND any reviewer pending > 48h → auto-escalate to Director."*
 
-Cloud Infrastructure Renewal (TBAk) has Proc Lead pending. Fleet Service Contract (TBAk) has Compliance pending. Both should fire this rule once the clock ages past 48h.
+Cloud Infrastructure Renewal (£485k) has Proc Lead pending. Fleet Service Contract (£312k) has Compliance pending. Both should fire this rule once the clock ages past 48h.
 
 **Stress test:** The rule is declared but the timer enforcement isn't implemented yet. Where's the cleanest hook to wire it in — a background scan, a deal-update trigger, an explicit "check rules" button? What would you want as the procurement lead?
 

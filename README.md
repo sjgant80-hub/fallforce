@@ -51,11 +51,11 @@ One button. All agents run in sequence. Complete daily action plan — briefing,
 
 ### Why sovereign software
 
-Salesforce charges TBA/month to hold your data hostage. FallForce does everything that matters for the cost of an API key.
+Salesforce charges $300/user/month to hold your data hostage. FallForce does everything that matters for the cost of an API key.
 
 | | Salesforce | FallForce |
 |---|---|---|
-| **Access** | TBA/month (Enterprise) | Free + your own API key |
+| **Price** | $300/user/month (Enterprise) | Free + your own API key |
 | **Data location** | Their servers, their rules | Your browser, your machine |
 | **Setup time** | 6-12 months implementation | Open HTML file. Done |
 | **AI** | Einstein GPT (limited, extra cost) | 8+1 agent swarm with full CRM context |
@@ -157,7 +157,7 @@ Channels: `fall-signal`, `fall-data`, `fall-bloom`
 ### Get an API key
 
 1. Go to [console.anthropic.com](https://console.anthropic.com)
-2. Create an account, add credits (TBA lasts weeks of heavy use)
+2. Create an account, add credits ($5 lasts weeks of heavy use)
 3. Generate an API key
 4. Paste it in the FallForce header bar
 
@@ -188,7 +188,7 @@ There is no tech stack. It's one HTML file.
 - **Solo founders** who need a CRM but not a Salesforce contract
 - **Small sales teams** who want AI-powered pipeline management without enterprise pricing
 - **Privacy-conscious** professionals who don't want client data on someone else's servers
-- **Anyone** tired of paying TBAnth for software that takes 6 months to configure
+- **Anyone** tired of paying $300/month for software that takes 6 months to configure
 
 ---
 
@@ -198,4 +198,4 @@ MIT. Use it, fork it, sell it, put it on a USB stick and hand it to your competi
 
 ---
 
-*◊·κ=1 · Sovereign software. No masters. not subscription-baseds. No permission needed.*
+*◊·κ=1 · Sovereign software. No masters. No subscriptions. No permission needed.*

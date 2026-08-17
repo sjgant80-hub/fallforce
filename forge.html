@@ -252,8 +252,10 @@ function collectConfig() {
     konomi_visible:   !$('#konomi_hide').checked,
     brand: {
       accent:     $('#brand_accent').value,
-      accent_dim: hexToRgba($('#brand_accent_dim').value, 0.18)},
-    pipeline_stages: stages.length ? stages : null};
+      accent_dim: hexToRgba($('#brand_accent_dim').value, 0.18),
+    },
+    pipeline_stages: stages.length ? stages : null,
+  };
 }
 
 async function signTrial(cfg, slug, prime) {
@@ -264,7 +266,9 @@ async function signTrial(cfg, slug, prime) {
       tool_id: slug,
       tool_prime: prime,
       gym_name: cfg.client_name,
-      days: cfg.trial_days})});
+      days: cfg.trial_days,
+    }),
+  });
   if (!r.ok) throw new Error('signer rejected · HTTP ' + r.status);
   const j = await r.json();
   if (!j.ok) throw new Error(j.error || 'signing failed');
@@ -311,7 +315,7 @@ function patchHtml(html, cfg, slug, prime, trialEnvelope, trialMeta) {
   // 4) nav logo replacements
   if (cfg.client_logo_text) {
     html = html.replace(/FallCRM<\/strong>/g, esc(cfg.client_logo_text) + '</strong>');
-    html = html.replace(/>FC<\/(\w+)>/g, '>' + esc(cfg.client_logo_text.slice(0,2).toUpperCase()) + '</TBA>');
+    html = html.replace(/>FC<\/(\w+)>/g, '>' + esc(cfg.client_logo_text.slice(0,2).toUpperCase()) + '</$1>');
   }
 
   // 5) product name swap
@@ -421,7 +425,8 @@ function renderSummary(cfg, slug, prime, trial, sizeBytes){
     '   1. Hand the HTML to the client (USB / email / SharePoint).',
     '   2. They double-click to open · works from file:// · no install.',
     '   3. Trial auto-activates · onboarding pre-fills · pipeline stages set.',
-    '   4. ' + trial.days + ' days later: in-app upgrade path to persistent Konomi licence.'].join('\n');
+    '   4. ' + trial.days + ' days later: in-app upgrade path to persistent Konomi licence.',
+  ].join('\n');
 }
 
 $('#buildBtn').onclick = build;
