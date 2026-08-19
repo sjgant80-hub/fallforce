@@ -1,0 +1,642 @@
+{
+ "kind": "fallforce-catalogue",
+ "crawled": "2026-08-19T21:27:36.354Z",
+ "indexGenerated": "2026-08-19",
+ "totalRepos": 1635,
+ "specDate": "2026-08",
+ "citeRule": "comparator prices per FallForce spec 2026-08 — pull and cite the current market price before this listing goes live",
+ "stack": {
+  "categories": [
+   {
+    "id": "crm",
+    "name": "CRM — contacts, deals, pipeline",
+    "rentMo": 195
+   },
+   {
+    "id": "email",
+    "name": "email & outreach",
+    "rentMo": 60
+   },
+   {
+    "id": "scheduler",
+    "name": "scheduling & booking",
+    "rentMo": 30
+   },
+   {
+    "id": "forms",
+    "name": "forms & intake",
+    "rentMo": 25
+   },
+   {
+    "id": "esign",
+    "name": "e-sign & documents",
+    "rentMo": 30
+   },
+   {
+    "id": "sms",
+    "name": "SMS & messaging",
+    "rentMo": 25
+   },
+   {
+    "id": "invoicing",
+    "name": "invoicing & payments-prep",
+    "rentMo": 20
+   },
+   {
+    "id": "automation",
+    "name": "automation & workflow",
+    "rentMo": 20
+   },
+   {
+    "id": "sovereignty",
+    "name": "the sovereignty-only shelf — local doc-analysis & private AI, for the data SaaS cannot legally hold",
+    "rentMo": 99
+   }
+  ],
+  "totalRentMo": 504,
+  "ok": true,
+  "rentMo": 504,
+  "rentYr": 6048,
+  "once": 499,
+  "saveY1": 5549,
+  "save5y": 29741,
+  "breakEvenDays": 30,
+  "cite": "comparator prices per FallForce spec 2026-08 — pull and cite the current market price before this listing goes live",
+  "line": "$499 once vs $6,048/yr rented = $5,549 saved year one"
+ },
+ "personalStack": {
+  "rentMo": 58,
+  "once": 50
+ },
+ "business": {
+  "automation": [
+   {
+    "name": "acg-mapper",
+    "live": true,
+    "desc": "⚒ ACG Mapper · an AI Craftspeople Guild diagnostic · paste your workflow, find your audit rung · forked from FallMap · single HTML · sovereign · prime 503",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/acg-mapper/"
+   },
+   {
+    "name": "fallmap",
+    "live": true,
+    "desc": "Paste your workflow · see what a £20k consultant builds · see the sovereign version that does the same for £0 · single HTML · on-device · prime 241",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallmap/"
+   },
+   {
+    "name": "mycelial-cognition-architecture",
+    "live": true,
+    "desc": "Defensive publication (public domain): Spore 001 — the Mycelial Cognition Architecture, distributed AI orchestration with stability by symmetry.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/mycelial-cognition-architecture/"
+   }
+  ],
+  "sovereignty": [
+   {
+    "name": "airgap",
+    "live": true,
+    "desc": "Air-gapped mesh compute: nodes share work over sound with zero network stack. Nothing to attack over the wire, because there is no wire.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/airgap/"
+   },
+   {
+    "name": "fallflip",
+    "live": true,
+    "desc": "The mirror · LinkedIn self-promo flip tool · paste their comment, get two responses (your post + theirs). Single HTML · sovereign · data on-device.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallflip/"
+   },
+   {
+    "name": "fallgravity",
+    "live": true,
+    "desc": "LinkedIn algorithm strategy tool · post scorer · hook generator · 90-min boost window · carousel builder · sovereign single HTML · on-device",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallgravity/"
+   }
+  ],
+  "email": [
+   {
+    "name": "contact",
+    "live": true,
+    "desc": "Direct line to Simon · GitHub Issue Forms · email auto-collected · auto-reply · no middleman · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/contact/"
+   },
+   {
+    "name": "falllist",
+    "live": true,
+    "desc": "Newsletter · your list · your terms · 0% fee · BYOM (Resend/Postmark/Mailgun/SendGrid) · obsoletes Mailchimp + Substack · prime 271",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllist/"
+   },
+   {
+    "name": "fallscout",
+    "live": true,
+    "desc": "LinkedIn Intelligence API - scrape, research, craft tailored outreach. Zero wasted small talk.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallscout/"
+   },
+   {
+    "name": "flux-api",
+    "live": true,
+    "desc": "AI Content Engine API - blog posts, social media, email campaigns, ad copy, landing pages via API. Multi-LLM. Structured JSON.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/flux-api/"
+   }
+  ],
+  "invoicing": [
+   {
+    "name": "docmind-api",
+    "live": true,
+    "desc": "AI Document Intelligence API - receipts, invoices, bank statements, contracts to structured JSON. Multi-LLM backend.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/docmind-api/"
+   },
+   {
+    "name": "fallap",
+    "live": true,
+    "desc": "◊ fallap · sovereign invoice rewriter · PYMNTS hierarchy of convenience · one-click pay · prime 383",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallap/"
+   },
+   {
+    "name": "fallclaimpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK claims firms · client escrow · CFA / DBA / hourly / fixed fee tracker · success-fee accruals · ATE insurance · FCA CMR fees + reporting · complaints register · PII · per-adviser P&L · firm P&L · invoice generator. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallclaimpractice/"
+   },
+   {
+    "name": "fallinvoice",
+    "live": true,
+    "desc": "◊ fallinvoice · sovereign single-file invoice + one-click-pay + reminders · prime 349",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallinvoice/"
+   },
+   {
+    "name": "falllegalpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK SRA-regulated solicitor practices · client account / office account ledgers · SRA Accounts Rules 2.5 / 7.1 / 8.3 · time recording · billing · disbursements · per-adviser P&L · firm P&L · PII tracking · COLP/COFA · AML supervision · CPD. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllegalpractice/"
+   },
+   {
+    "name": "fallpay",
+    "live": true,
+    "desc": "Sovereign multi-rail payment receipt · Stripe+PayPal+crypto+invoice · MIT · ◊·κ=1 · prime 307",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallpay/"
+   },
+   {
+    "name": "fallpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK IFA practices · adviser fee ledger · trail commission · CASS segregation · PI/FCA accruals · per-client RIY · per-adviser P&L · firm P&L · invoice generator · RegData hint. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallpractice/"
+   }
+  ],
+  "crm": [
+   {
+    "name": "estate-nest",
+    "live": true,
+    "desc": "The OFFRAMP pipeline pointed inward — the ~1000-repo estate nested into the dodeca memory: signed by content, placed by golden angle, wired by typed edges, WALKABLE. Answer 'what do I have' by traversing. Proof-of-play CLEAN.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/estate-nest/"
+   },
+   {
+    "name": "fallcorp",
+    "live": true,
+    "desc": "◊ FallCorp · the bundled sovereign SMB stack · 17 organs in one shell · shared contacts · Konomi SSO · MIT · prime 1327",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallcorp/"
+   },
+   {
+    "name": "fallcrm",
+    "live": true,
+    "desc": "◊ fallcrm · sovereign single-file CRM · the delete-HubSpot wedge · prime 373",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallcrm/"
+   },
+   {
+    "name": "fallcrm-elite",
+    "live": true,
+    "desc": "Sovereign CRM. Signal timelines. Agentic follow-up. Snap-in FallHub module. MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallcrm-elite/"
+   },
+   {
+    "name": "fallforce",
+    "live": true,
+    "desc": "FallCRM Elite · Sovereign Sales Platform",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallforce/"
+   },
+   {
+    "name": "fallhire",
+    "live": true,
+    "desc": "◊ fallhire · sovereign hiring pipeline + interview scorecard · single HTML · prime 359",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallhire/"
+   },
+   {
+    "name": "fallreach",
+    "live": true,
+    "desc": "Sovereign AI SDR. Your hardware. Your keys. Your pipeline.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallreach/"
+   },
+   {
+    "name": "trilogy-forge-api",
+    "live": true,
+    "desc": "The factory that makes factories. POST config, GET a sovereign HTML application. 9 forge types, 4 data APIs, AI agent swarms, works offline.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/trilogy-forge-api/"
+   },
+   {
+    "name": "trilogy-framework",
+    "live": true,
+    "desc": "The AI Pipeline Framework - Input to Intelligence to Output as one declarative flow",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/trilogy-framework/"
+   }
+  ],
+  "forms": [
+   {
+    "name": "fallform",
+    "live": true,
+    "desc": "Forms · no response cap · ever · sovereign single HTML · obsoletes Typeform/JotForm · prime 269",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallform/"
+   }
+  ],
+  "scheduler": [
+   {
+    "name": "glampos",
+    "live": true,
+    "desc": "Site automation for glamping and small stays. One editable kernel drives unified bookings across direct, Booking.com, Airbnb and a free co-op feed, with a double-booking guard that catches clashes before a guest is confirmed.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/glampos/"
+   },
+   {
+    "name": "wishwood",
+    "live": true,
+    "desc": "Sovereign multi-channel automation for off-grid glamping. Built for Wishwood (Canterbury, Kent). Unified inbox + calendar + direct booking + AI replies. Zero SaaS.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/wishwood/"
+   },
+   {
+    "name": "fallhub",
+    "live": true,
+    "desc": "Sovereign direct-booking + unified inbox + AI reply drafting for independent stay operators · MIT · fork-and-configure · Wishwood-tested",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallhub/"
+   },
+   {
+    "name": "falloffice",
+    "live": true,
+    "desc": "Sovereign Microsoft 365 alternative. Single HTML, no server, no subscription. Words · Sheets · Slides · Mail · Calendar · Notes · Tasks · plus an Ω orchestrator with autopilot.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falloffice/"
+   },
+   {
+    "name": "fallseed-agents",
+    "live": true,
+    "desc": "FallSeed Agents — level-3 seed · 6 role-tier agent presets with in-tab scheduler in one HTML · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-agents/"
+   },
+   {
+    "name": "fallslot",
+    "live": true,
+    "desc": "Share a calendar link · sovereign · single HTML · zero subscription · obsoletes Calendly · prime 263",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallslot/"
+   },
+   {
+    "name": "roost",
+    "live": true,
+    "desc": "Sovereign stays-as-commons marketplace · cooperative · zero booking fees · built on open stays-protocol · the Airbnb alternative",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/roost/"
+   }
+  ],
+  "sms": [
+   {
+    "name": "fallmail",
+    "live": true,
+    "desc": "P2P encrypted messaging · DID-addressed · ECDH+AES-GCM · no SMTP no server · FallID+FallLink+FallPod stack",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallmail/"
+   }
+  ],
+  "esign": [
+   {
+    "name": "fallsignature",
+    "live": true,
+    "desc": "Sovereign Ed25519 content signing + verification · runs locally · nothing leaves your browser",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallsignature/"
+   },
+   {
+    "name": "foldsig",
+    "live": true,
+    "desc": "Fold-signature format + validator: describe a thing as a generative recipe. Round-trip, witness, non-masking compose. Zero deps.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/foldsig/"
+   },
+   {
+    "name": "geometric-computer",
+    "live": true,
+    "desc": "The v23 geometric-computing stack, gated: L1 primorial fold codec (lossless state⇄number) + L2 Entropic Torus Harmonics (which fold-signatures are stable — golden holds, resonance cancels). Proof-of-play CLEAN.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/geometric-computer/"
+   },
+   {
+    "name": "kcc-jobs",
+    "live": true,
+    "desc": "KCC Jobs · the agent economy marketplace · post jobs in KCC, agents bid, deliverables submitted, acceptance signature settles · 5 bundle types · reputation engine · wallet · overseer dashboard · sovereign Ed25519 · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/kcc-jobs/"
+   },
+   {
+    "name": "konomi-redteam",
+    "live": true,
+    "desc": "A red-team taxonomy classified by the property exploited, a collapse corpus recorded as signatures rather than payloads, and a gate on the suite itself.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/konomi-redteam/"
+   }
+  ]
+ },
+ "personal": {
+  "budget": [
+   {
+    "name": "accountinghouse",
+    "live": true,
+    "desc": "The accounting-practice showroom for FallHub. Sovereign AI-first OS for accountants. MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/accountinghouse/"
+   },
+   {
+    "name": "fallaccount",
+    "live": true,
+    "desc": "FallAccount Elite - Sovereign accounting for UK sole traders. Any LLM. Single HTML file. Zero SaaS.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallaccount/"
+   },
+   {
+    "name": "fallclaimpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK claims firms · client escrow · CFA / DBA / hourly / fixed fee tracker · success-fee accruals · ATE insurance · FCA CMR fees + reporting · complaints register · PII · per-adviser P&L · firm P&L · invoice generator. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallclaimpractice/"
+   },
+   {
+    "name": "fallestatepractice",
+    "live": true,
+    "desc": "Sovereign UK estate & letting agent firm accounting.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallestatepractice/"
+   },
+   {
+    "name": "falllegalpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK SRA-regulated solicitor practices · client account / office account ledgers · SRA Accounts Rules 2.5 / 7.1 / 8.3 · time recording · billing · disbursements · per-adviser P&L · firm P&L · PII tracking · COLP/COFA · AML supervision · CPD. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllegalpractice/"
+   },
+   {
+    "name": "fallmortgagepractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK FCA-regulated mortgage broker practices.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallmortgagepractice/"
+   },
+   {
+    "name": "fallpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK IFA practices · adviser fee ledger · trail commission · CASS segregation · PI/FCA accruals · per-client RIY · per-adviser P&L · firm P&L · invoice generator · RegData hint. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallpractice/"
+   },
+   {
+    "name": "fallstack",
+    "live": true,
+    "desc": "◊ FallStack · sovereign SaaS audit + migration engine · drop your accounting · we map every sub to a free sovereign replacement · the savings dashboard · MIT · prime 1321",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallstack/"
+   },
+   {
+    "name": "openkonomi",
+    "live": true,
+    "desc": "A personal AI agent that cannot exceed its grant: every skill declares what it reaches for, every action is checked against a capability AND a budget before it happens, and a skill whose text contradicts its declaration is refused rather than warned about. SKILL.md compatible. 130 tests, witness clean.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/openkonomi/"
+   },
+   {
+    "name": "the-wallet",
+    "live": true,
+    "desc": "A sovereign agent wallet: an Ed25519 identity that is a capability plus a budget it cannot cross, with fork lineage. Runaway spend becomes impossible by construction rather than by policy.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/the-wallet/"
+   }
+  ],
+  "private-ai": [
+   {
+    "name": "divorcerbot",
+    "live": true,
+    "desc": "UK divorce self-help (E&W/Scotland/NI) that levels the playing field: verified law, CMS calculator, cited case-law strategy, BYOK/WebLLM analyser. Not legal advice.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/divorcerbot/"
+   },
+   {
+    "name": "fall-kit",
+    "live": true,
+    "desc": "Fall Kit · shared AI cascade (T0/T2 WebLLM 1B-70B/T3 BYOK frontier) + WebRTC mesh for every estate seed · inlineable JS · MIT",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/fall-kit/"
+   },
+   {
+    "name": "botler",
+    "live": true,
+    "desc": "sovereign personal memory agent · WebLLM offline · OAuth client-side · your machine your data · prime 619",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/botler/"
+   },
+   {
+    "name": "fall-autopilot-kit",
+    "live": true,
+    "desc": "Sovereign browser autopilot kit · WebLLM-driven action-manifest runner · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fall-autopilot-kit/"
+   },
+   {
+    "name": "fall-sdk-generator",
+    "live": true,
+    "desc": "WebLLM-powered SDK+MCP generator · consumes foldkit-sdk + foldkit-mcp exemplars + estate tool source · generates companion repos locally · zero Claude tokens",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fall-sdk-generator/"
+   },
+   {
+    "name": "falllegal",
+    "live": true,
+    "desc": "Sovereign single-file matter management + UK law research engine for 1-10 person SRA-regulated solicitor firms. Multi-firm, multi-adviser, multi-client, multi-matter. 12 practice areas, ~30 inline weaves, T0 offline + T3 BYOK cascade. Audit chain, conflict checking, SRA 6yr retention. Informational, not regulatory submission.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllegal/"
+   },
+   {
+    "name": "fallpost",
+    "live": true,
+    "desc": "Sovereign LinkedIn engine · Jung+Freud+Sales 101 baked in · BYOK cascade · sovereign tone seed",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallpost/"
+   },
+   {
+    "name": "fallsecurity",
+    "live": true,
+    "desc": "FallCube · sovereign AI security as geometry · 8+1 vertex architecture · defeats gradient injection · WebLLM in-browser demo",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallsecurity/"
+   },
+   {
+    "name": "honestly",
+    "live": true,
+    "desc": "◊ HONESTLY · verified search · the Perplexity killer · 3-vote adversarial verification on every claim · Konomi-signed answer envelopes · BYOK search + LLM · sovereign single-file · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/honestly/"
+   }
+  ],
+  "storage": [
+   {
+    "name": "fall-remember",
+    "live": true,
+    "desc": "Content-addressed memory in twelve chambers: sign by content, route to a chamber, traverse typed edges between them. Balanced placement by golden-angle addressing. Zero dependencies.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fall-remember/"
+   },
+   {
+    "name": "fallcube-api",
+    "live": true,
+    "desc": "Sovereign File Storage API - upload, search, analyze, stream. Zero cloud.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallcube-api/"
+   },
+   {
+    "name": "fallecho",
+    "live": true,
+    "desc": "Content-addressed page archiver · pin any page · CID-verified · signed attestations · sovereign uncensorable mirror",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallecho/"
+   },
+   {
+    "name": "falllens",
+    "live": true,
+    "desc": "Peer-relay URL viewer · fetch web content via trusted peers · signed + content-addressed · sovereign browsing primitive",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllens/"
+   },
+   {
+    "name": "fallstore",
+    "live": true,
+    "desc": "Content-addressed storage · IPFS-lite in one file · SHA-256 CIDs · verify by hash · foundational estate layer",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallstore/"
+   },
+   {
+    "name": "fallvault",
+    "live": true,
+    "desc": "Sovereign emergency backup · one HTML file · AES-256-GCM in your browser · MIT · ◊·κ=1",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallvault/"
+   },
+   {
+    "name": "missig",
+    "live": true,
+    "desc": "Records the changes that did NOT get made — content-addressed, with the reason why — so a system can learn from its own rejected options.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/missig/"
+   },
+   {
+    "name": "offramp-v2",
+    "live": true,
+    "desc": "The sovereign chat-history off-ramp — a dead vendor JSON export → live searchable memory. Content-addressed (cross-vendor dedupe proven), versioned extraction, the wisp over your own thinking-history. Runs in your browser. Proof-of-play CLEAN 60/60.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/offramp-v2/"
+   },
+   {
+    "name": "wishwood-keeper",
+    "live": true,
+    "desc": "Phone-first, offline, no-login housekeeping board for an off-grid site: jobs, per-camp turnover checklists and supply logs. A low supply reading automatically raises an urgent reorder job. Local per device — backup-shared, not live sync.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/wishwood-keeper/"
+   }
+  ],
+  "notes": [
+   {
+    "name": "fallgarden",
+    "live": true,
+    "desc": "Sovereign Obsidian-shape second brain · markdown + wikilinks + graph · fall-kit cascade · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallgarden/"
+   },
+   {
+    "name": "fallgarden-api",
+    "live": true,
+    "desc": "FallGarden API · sovereign file-based second brain toolkit · MIT · AI-Native Solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallgarden-api/"
+   },
+   {
+    "name": "fallgarden-mcp",
+    "live": true,
+    "desc": "FallGarden MCP · sovereign file-based second brain toolkit · MIT · AI-Native Solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallgarden-mcp/"
+   },
+   {
+    "name": "fallgarden-sdk",
+    "live": true,
+    "desc": "FallGarden SDK · sovereign file-based second brain toolkit · MIT · AI-Native Solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallgarden-sdk/"
+   },
+   {
+    "name": "falloffice",
+    "live": true,
+    "desc": "Sovereign Microsoft 365 alternative. Single HTML, no server, no subscription. Words · Sheets · Slides · Mail · Calendar · Notes · Tasks · plus an Ω orchestrator with autopilot.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falloffice/"
+   },
+   {
+    "name": "fallpaper",
+    "live": true,
+    "desc": "Single-file tool that generates the documents a UK financial-advisory firm has to produce to stay compliant: engagement letters, fact-finds, suitability reports, annual review packs, MiFID II costs disclosure, CIDD, vulnerable-customer assessment notes and tax-year-end letters.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallpaper/"
+   },
+   {
+    "name": "fallscribe",
+    "live": true,
+    "desc": "◊ FallScribe · sovereign meeting-notes engine · browser MediaRecorder + Web Speech + WebLLM · obsoletes Granola for £0 · single-file · MIT · forever",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallscribe/"
+   }
+  ],
+  "passwords": [
+   {
+    "name": "konomium-vault",
+    "live": true,
+    "desc": "Encrypted accounting foundation: AES-GCM vault, bank ingest, sync and Making Tax Digital submission. 79 tests.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/konomium-vault/"
+   }
+  ]
+ },
+ "rankWhy": "shortlist rank only — live + described + term relevance. Gate-pass is judged at packaging, never here.",
+ "refused": {
+  "private": 45,
+  "archived": 136,
+  "fork": 34,
+  "unclaimed": 1348
+ }
+}

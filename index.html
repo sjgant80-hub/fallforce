@@ -2893,7 +2893,7 @@ async function sendAI() {
     const res = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-dangerous-direct-browser-access':'true','anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system,messages:DB.aiHistory.slice(-12)})
+      body:JSON.stringify({model:'claude-fable-5',max_tokens:1200,system,messages:DB.aiHistory.slice(-12)})
     });
     const data = await res.json();
     typing.remove();
@@ -2948,7 +2948,7 @@ WON MTD: ${cur}${DB.deals.filter(d=>d.stage==='Closed Won').reduce((s,d)=>s+d.va
 
 async function callClaude(msg, key, agentTag='AI') {
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-dangerous-direct-browser-access':'true','anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:`You are a FallCRM AI agent (${agentTag}). CRM Data:\n${buildCRMContext()}`,messages:[{role:'user',content:msg}]})});
+    const r = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-dangerous-direct-browser-access':'true','anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-fable-5',max_tokens:1000,system:`You are a FallCRM AI agent (${agentTag}). CRM Data:\n${buildCRMContext()}`,messages:[{role:'user',content:msg}]})});
     const d = await r.json();
     if(d.error) throw new Error(d.error.message);
     return d.content[0].text;
@@ -3276,7 +3276,7 @@ async function apCallAgent(id, systemPrompt, ctx, key) {
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-dangerous-direct-browser-access':'true','anthropic-version':'2023-06-01'},
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-fable-5',
       max_tokens: id === 'omega' ? 2000 : 700,
       system: sys,
       messages: [{ role:'user', content: id === 'omega' ? systemPrompt.slice(systemPrompt.indexOf('Now produce')) : 'Run your analysis now.' }]
@@ -5073,7 +5073,7 @@ window.addEventListener('load', () => {
             'x-fallcore-tool': (window.NODE ? window.NODE.id : 'anon')
           },
           body: JSON.stringify({
-            model: opts.model || 'claude-sonnet-4-20250514',  // FallCore picks local first regardless
+            model: opts.model || 'claude-fable-5',  // FallCore picks local first regardless
             max_tokens: opts.max_tokens || 2048,
             system: opts.system || 'You are a helpful assistant for ' + (window.NODE ? window.NODE.name : 'this app') + '. Reply concisely.',
             messages: [{ role: 'user', content: prompt }],
@@ -5100,7 +5100,7 @@ window.addEventListener('load', () => {
             'anthropic-dangerous-direct-browser-access': 'true'
           },
           body: JSON.stringify({
-            model: opts.model || 'claude-sonnet-4-20250514',
+            model: opts.model || 'claude-fable-5',
             max_tokens: opts.max_tokens || 2048,
             system: opts.system || 'You are a helpful assistant for ' + (window.NODE ? window.NODE.name : 'this app') + '. Reply concisely.',
             messages: [{ role: 'user', content: prompt }]

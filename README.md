@@ -1,4 +1,13 @@
-# FallForce — Sovereign CRM
+# FallForce — the whole stack, owned once
+
+**LIVE — the stack catalogue: https://sjgant80-hub.github.io/fallforce/stack.html**
+**LIVE — FallCRM Elite (the CRM shelf's flagship): https://sjgant80-hub.github.io/fallforce/**
+
+FallForce is the Salesforce-killer: CRM, email, scheduling, forms, e-sign, SMS, invoicing,
+automation, and the sovereignty-only tools SaaS cannot legally serve — the whole shadow-stack you
+**own once** instead of renting forever. The savings math is derived by a witness-gated kernel
+(`catalogue.mjs`), the catalogue is crawled from the full estate index, and nothing is for sale
+until the payment-rail door is signed by the master key — counsel first.
 
 > **FACE**: One HTML file. Zero servers. Zero subscriptions. A full CRM with an 8+1 AI swarm that runs in your browser. Your pipeline, your data, your machine.
 

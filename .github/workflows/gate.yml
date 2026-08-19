@@ -20,6 +20,24 @@ jobs:
             --baseline witness.forecast.baseline.json \
             --test "node forecast.test.mjs"
 
+      - name: proof-of-play — the stack catalogue
+        run: node catalogue.test.mjs
+
+      - name: witness — the catalogue kernel
+        run: |
+          node /tmp/witness/witness.mjs mutate catalogue.mjs \
+            --cap 400 \
+            --test "node catalogue.test.mjs"
+
+      - name: the stack page still matches the catalogue
+        run: |
+          cp stack.html /tmp/stack-shipped.html
+          node scripts/build-stack.mjs
+          diff -q /tmp/stack-shipped.html stack.html || {
+            echo "::error::stack.html has drifted from catalogue.json — run scripts/build-stack.mjs and commit."
+            exit 1
+          }
+
       - name: the shipped page still matches the gated kernel
         run: |
           cp index.html /tmp/shipped.html
