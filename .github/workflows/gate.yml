@@ -38,6 +38,15 @@ jobs:
             exit 1
           }
 
+      - name: the verticals page still matches the catalogue
+        run: |
+          cp verticals.html /tmp/verticals-shipped.html
+          node scripts/build-verticals.mjs
+          diff -q /tmp/verticals-shipped.html verticals.html || {
+            echo "::error::verticals.html has drifted from catalogue.json — run scripts/build-verticals.mjs and commit."
+            exit 1
+          }
+
       - name: the shipped page still matches the gated kernel
         run: |
           cp index.html /tmp/shipped.html

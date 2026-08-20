@@ -1,6 +1,6 @@
 {
  "kind": "fallforce-catalogue",
- "crawled": "2026-08-19T21:27:36.354Z",
+ "crawled": "2026-08-20T08:36:29.085Z",
  "indexGenerated": "2026-08-19",
  "totalRepos": 1635,
  "specDate": "2026-08",
@@ -632,6 +632,274 @@
    }
   ]
  },
+ "verticals": {
+  "adviser-firms": [
+   {
+    "name": "falladviser",
+    "live": true,
+    "desc": "£ FallAdviser · sovereign UK financial adviser · UK 2025-26 tax rules · ISA/SIPP/LISA optimiser · pension projector · portfolio analyser · Q&A T0+T3 · estate-aware · si-didy postMessage API · Mansoor P3 audit chain · informational not regulated · single HTML · prime 719 · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falladviser/"
+   },
+   {
+    "name": "falladviser-v2",
+    "live": true,
+    "desc": "Multi-client / multi-adviser / multi-firm",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falladviser-v2/"
+   },
+   {
+    "name": "falladviser-v2-api",
+    "live": true,
+    "desc": "falladviser-v2 api · UK financial adviser calculations · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falladviser-v2-api/"
+   },
+   {
+    "name": "falladviser-v2-mcp",
+    "live": true,
+    "desc": "falladviser-v2 mcp · UK financial adviser calculations · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falladviser-v2-mcp/"
+   },
+   {
+    "name": "falladviser-v2-sdk",
+    "live": true,
+    "desc": "falladviser-v2 sdk · UK financial adviser calculations · MIT",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falladviser-v2-sdk/"
+   },
+   {
+    "name": "falllegal",
+    "live": true,
+    "desc": "Sovereign single-file matter management + UK law research engine for 1-10 person SRA-regulated solicitor firms. Multi-firm, multi-adviser, multi-client, multi-matter. 12 practice areas, ~30 inline weaves, T0 offline + T3 BYOK cascade. Audit chain, conflict checking, SRA 6yr retention. Informational, not regulatory submission.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllegal/"
+   },
+   {
+    "name": "fallpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK IFA practices · adviser fee ledger · trail commission · CASS segregation · PI/FCA accruals · per-client RIY · per-adviser P&L · firm P&L · invoice generator · RegData hint. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallpractice/"
+   }
+  ],
+  "accountancy": [
+   {
+    "name": "fallbooksonboard",
+    "live": true,
+    "desc": "Sovereign accountancy-firm client onboarding · AML CDD · PSC + beneficial-ownership capture · engagement letter draft · audit chain · single HTML file.",
+    "score": 3,
+    "url": "https://sjgant80-hub.github.io/fallbooksonboard/"
+   },
+   {
+    "name": "fallbooks",
+    "live": true,
+    "desc": "Sovereign single-file UK accountancy practice tool. Multi-firm, multi-adviser, multi-client. SA · CT · VAT · PAYE · Companies House. Deadline grid, bookkeeping, MTD-shaped VAT, R&D, payroll RTI. Practitioner aid — submissions remain your responsibility.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallbooks/"
+   },
+   {
+    "name": "fallbookspaper",
+    "live": true,
+    "desc": "Sovereign accountancy document generator for UK practices. Engagement letters, SA100/CT600/VAT100 summaries, management accounts, year-end packs, R&D narratives, payslips, P60, P11D, dividend vouchers, director",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallbookspaper/"
+   },
+   {
+    "name": "fallbookspractice",
+    "live": true,
+    "desc": "Sovereign practice management for UK accountancy firms.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallbookspractice/"
+   },
+   {
+    "name": "falllegalonboard",
+    "live": true,
+    "desc": "Sovereign SRA-shaped client onboarding for UK solicitor firms: CDD (individual + entity), beneficial-ownership/PSC capture, source-of-funds, PEP & sanctions, vulnerable-client (SRA Equality), document capture with SHA-256, conflict-of-interest broadcast across the falllegal bundle, risk grading and EDD triggers, 6-year audit chain.…",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllegalonboard/"
+   },
+   {
+    "name": "falllegalpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK SRA-regulated solicitor practices · client account / office account ledgers · SRA Accounts Rules 2.5 / 7.1 / 8.3 · time recording · billing · disbursements · per-adviser P&L · firm P&L · PII tracking · COLP/COFA · AML supervision · CPD. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falllegalpractice/"
+   },
+   {
+    "name": "fallseed-accountancy",
+    "live": true,
+    "desc": "FallSeed for UK accountancy firms — single-HTML PWA · 4 tools · LLM-agnostic cascade · MIT · sovereign",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-accountancy/"
+   },
+   {
+    "name": "fallseed-accountancy-api",
+    "live": true,
+    "desc": "fallseed-accountancy api · @ai-native-solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-accountancy-api/"
+   },
+   {
+    "name": "fallseed-accountancy-mcp",
+    "live": true,
+    "desc": "fallseed-accountancy mcp · @ai-native-solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-accountancy-mcp/"
+   },
+   {
+    "name": "fallseed-accountancy-sdk",
+    "live": true,
+    "desc": "fallseed-accountancy sdk · @ai-native-solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-accountancy-sdk/"
+   }
+  ],
+  "claims-firms": [
+   {
+    "name": "fallclaimonboard",
+    "live": true,
+    "desc": "Sovereign FCA CMR-shaped claimant onboarding for UK claims firms (CMC + solicitor practices). Capacity assessment, referral source disclosure, cooling-off register, complaints register, conflict check, CFA/DBA fee disclosure, ATE, document capture, audit chain. IDB-only · device-local · single HTML file.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/fallclaimonboard/"
+   },
+   {
+    "name": "fallclaimpaper",
+    "live": true,
+    "desc": "Sovereign UK claims document generator for CMC and solicitor claims firms. CFA / DBA agreements · Letter of Claim · Pre-Action Disclosure · Part 36 offers · Schedule of Loss · Witness Statements · Instructions to Expert · Complaints · Cooling-off · Bill of Costs · N1 narrative. Single HTML. Client data never leaves device.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/fallclaimpaper/"
+   },
+   {
+    "name": "fallclaim",
+    "live": true,
+    "desc": "Sovereign single-file case management for UK claims firms (PI/RTA/EL/PL/clinical neg/housing/financial mis-selling). JC Guideline quantum, Civil Liability Act 2018 whiplash tariff, Ogden multipliers, pre-action protocol trackers, Part 36 register, limitation calculator. Research aid, not legal advice.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallclaim/"
+   },
+   {
+    "name": "fallclaimpractice",
+    "live": true,
+    "desc": "Sovereign firm-side accounting for UK claims firms · client escrow · CFA / DBA / hourly / fixed fee tracker · success-fee accruals · ATE insurance · FCA CMR fees + reporting · complaints register · PII · per-adviser P&L · firm P&L · invoice generator. Single HTML, IDB primary, MIT.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallclaimpractice/"
+   },
+   {
+    "name": "falljustice",
+    "live": true,
+    "desc": "Letter-before-action and data-subject-access-request engine for UK consumer claims. Verified case law, cited throughout. Not legal advice.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/falljustice/"
+   },
+   {
+    "name": "fallseed-claims",
+    "live": true,
+    "desc": "FallSeed for UK claims firms — single-HTML PWA · 4 tools · LLM-agnostic cascade · MIT · sovereign",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-claims/"
+   },
+   {
+    "name": "fallseed-claims-api",
+    "live": true,
+    "desc": "fallseed-claims api · @ai-native-solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-claims-api/"
+   },
+   {
+    "name": "fallseed-claims-mcp",
+    "live": true,
+    "desc": "fallseed-claims mcp · @ai-native-solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-claims-mcp/"
+   },
+   {
+    "name": "fallseed-claims-sdk",
+    "live": true,
+    "desc": "fallseed-claims sdk · @ai-native-solutions",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallseed-claims-sdk/"
+   }
+  ],
+  "lettings": [
+   {
+    "name": "fallestateonboard",
+    "live": true,
+    "desc": "Sovereign UK estate & letting agent client onboarding.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallestateonboard/"
+   },
+   {
+    "name": "fallestatepaper",
+    "live": true,
+    "desc": "Sovereign UK estate & letting agent document generation.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallestatepaper/"
+   },
+   {
+    "name": "fallestatepractice",
+    "live": true,
+    "desc": "Sovereign UK estate & letting agent firm accounting.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallestatepractice/"
+   }
+  ],
+  "insurance-brokers": [
+   {
+    "name": "fallinsuranceonboard",
+    "live": true,
+    "desc": "Sovereign IDD-shaped client onboarding for UK FCA-regulated insurance brokers.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/fallinsuranceonboard/"
+   },
+   {
+    "name": "fallinsurancepaper",
+    "live": true,
+    "desc": "Sovereign UK insurance broker document generator. TOBA, demands & needs, IPID, policy summary, cover note, mid-term adjustment, renewal, cancellation, claim notification, LoA, complaint, final response, commercial schedule, premium finance disclosure, vulnerable customer note. Single HTML. Client data never leaves device.",
+    "score": 2,
+    "url": "https://sjgant80-hub.github.io/fallinsurancepaper/"
+   },
+   {
+    "name": "fallinsurance",
+    "live": true,
+    "desc": "Sovereign single-file UK GI insurance broker policy management anchor.",
+    "score": 1,
+    "url": "https://sjgant80-hub.github.io/fallinsurance/"
+   }
+  ]
+ },
+ "verticalDefs": [
+  {
+   "id": "claims-firms",
+   "name": "UK claims firms",
+   "who": "CMCs and solicitor claims practices (PI/RTA/EL/PL/clinical)",
+   "pitch": "case management, claims document generation, and firm-side accounting with client escrow — on your machines, not a vendor’s"
+  },
+  {
+   "id": "accountancy",
+   "name": "accountancy practices",
+   "who": "multi-partner accountancy and bookkeeping firms",
+   "pitch": "practice tooling and AML/CDD client onboarding that never uploads a client record anywhere"
+  },
+  {
+   "id": "insurance-brokers",
+   "name": "FCA-regulated insurance brokers",
+   "who": "brokerages under IDD conduct rules",
+   "pitch": "IDD-shaped onboarding and the TOBA / demands-and-needs paper trail, generated in-house"
+  },
+  {
+   "id": "lettings",
+   "name": "estate & letting agents",
+   "who": "lettings and estate agencies",
+   "pitch": "client onboarding that keeps tenant and landlord data inside the agency"
+  },
+  {
+   "id": "adviser-firms",
+   "name": "financial adviser firms",
+   "who": "multi-adviser, multi-firm advice practices",
+   "pitch": "multi-client adviser tooling with UK tax rules built in — client files stay in the practice"
+  }
+ ],
  "rankWhy": "shortlist rank only — live + described + term relevance. Gate-pass is judged at packaging, never here.",
  "refused": {
   "private": 45,

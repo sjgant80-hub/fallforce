@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUSINESS, PERSONAL, SPEC_DATE, CITE_RULE, classify, rank, stackView } from '../catalogue.mjs';
+import { BUSINESS, PERSONAL, VERTICALS, SPEC_DATE, CITE_RULE, classify, rank, stackView } from '../catalogue.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const INDEX = process.argv[2] || 'C:/Users/sjgan/.claude/projects/C--Users-sjgan--claude/memory/estate-index.json';
@@ -22,6 +22,7 @@ if (!Array.isArray(idx.nodes) || idx.nodes.length < 100) {
 
 const business = rank(idx.nodes, BUSINESS);
 const personal = rank(idx.nodes, PERSONAL);
+const verticals = rank(idx.nodes, VERTICALS);
 const refused = { private: 0, archived: 0, fork: 0, unclaimed: 0 };
 for (const n of idx.nodes) {
   const c = classify(n, [...BUSINESS, ...PERSONAL]);
@@ -43,6 +44,8 @@ const out = {
   personalStack: { rentMo: PERSONAL.reduce((s, c) => s + c.rentMo, 0), once: 50 },
   business: business.shortlist,
   personal: personal.shortlist,
+  verticals: verticals.shortlist,
+  verticalDefs: VERTICALS.map(v => ({ id: v.id, name: v.name, who: v.who, pitch: v.pitch })),
   rankWhy: business.why,
   refused,
 };

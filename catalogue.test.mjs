@@ -1,7 +1,7 @@
 // fallforce · catalogue.test.mjs — the stack catalogue, every rule falsifiable.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BUSINESS, PERSONAL, SPEC_DATE, CITE_RULE, classify, rank, savings, stackView } from './catalogue.mjs';
+import { BUSINESS, PERSONAL, VERTICALS, SPEC_DATE, CITE_RULE, classify, rank, savings, stackView } from './catalogue.mjs';
 
 test('THE HEADLINE MATH IS DERIVED, NOT TYPED — and lands exactly on the spec', () => {
   // the spec's own pitch: $504/mo shadow stack, $499 bundle, $5,549 saved year one, $29,741 over 5, ~1 month break-even
@@ -129,6 +129,22 @@ test('WHEN LIVE AND DESCRIBED TIE, THE SCORE ALONE DECIDES — never the name', 
   ]);
   assert.deepEqual(r.shortlist.crm.map(x => x.name), ['z-strong', 'a-weak'],
     'the stronger match wins even though its name sorts last');
+});
+
+test('THE VERTICAL SHELF READS THE REAL REGULATED ESTATE — and estate-the-word is never a match', () => {
+  assert.equal(classify({ name: 'fallclaim', desc: 'case management for UK claims firms' }, VERTICALS).category, 'claims-firms');
+  assert.equal(classify({ name: 'fallbooksonboard', desc: 'accountancy-firm client onboarding · AML CDD' }, VERTICALS).category, 'accountancy');
+  assert.equal(classify({ name: 'fallinsuranceonboard', desc: 'IDD-shaped onboarding for FCA-regulated insurance brokers' }, VERTICALS).category, 'insurance-brokers');
+  assert.equal(classify({ name: 'fallestateonboard', desc: 'UK estate & letting agent client onboarding' }, VERTICALS).category, 'lettings');
+  assert.equal(classify({ name: 'falladviser-v2', desc: 'Multi-client / multi-adviser / multi-firm' }, VERTICALS).category, 'adviser-firms');
+  // "sovereign estate" appears in hundreds of descs — it must never drag a repo onto the lettings shelf
+  assert.equal(classify({ name: 'fallmap', desc: 'part of the sovereign estate' }, VERTICALS).ok, false,
+    'the word estate alone claims nothing — lettings needs letting-agent language');
+  // fallbooks says multi-adviser AND accountancy: the tie breaks to the earlier shelf, deterministically
+  assert.equal(classify({ name: 'fallbooks', desc: 'UK accountancy practice tool. Multi-firm, multi-adviser' }, VERTICALS).category, 'accountancy');
+  assert.throws(() => { VERTICALS.push({ id: 'x' }); });
+  assert.throws(() => { VERTICALS[0].words.push('everything'); });
+  for (const v of VERTICALS) assert.ok(v.who && v.pitch, v.id + ' names its buyer and its pitch');
 });
 
 test('FUZZ: total on garbage', () => {

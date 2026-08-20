@@ -70,7 +70,8 @@ and counsel comes before it opens the first time.<br>
 · "Owned, offline, data never leaves" is a gate-checked claim per build at packaging — a tool that
 phones home does not ship, at any price.</div>
 
-<p><a href="index.html">FallCRM Elite — the CRM shelf's flagship, live now →</a></p>
+<p><a href="verticals.html">the regulated shelf — for firms whose data cannot leave the building →</a>
+&nbsp;·&nbsp; <a href="index.html">FallCRM Elite — the CRM flagship, live now →</a></p>
 <footer>generated from catalogue.json — no number typed by hand · crawled ${esc(cat.crawled)}
 · comparator prices per FallForce spec ${esc(cat.specDate)} · Konomi Architecture</footer>
 </body></html>`;

@@ -45,7 +45,29 @@ export const PERSONAL = Object.freeze([
   C('budget', 'budget & money tracking', 15, ['budget', 'budgeting', 'expense', 'expenses', 'spending', 'accounting']),
 ]);
 
-for (const list of [BUSINESS, PERSONAL]) for (const c of list) { Object.freeze(c.words); Object.freeze(c); }
+// THE VERTICAL SHELF — regulated-firm tools where sovereignty IS the product: the buyer is a
+// FIRM with a legal reason to keep client data in-house, and the sale is five emails, not an
+// audience. No rent comparator here — B2B pricing is a conversation, and the page says so.
+const V = (id, name, who, words, pitch) => ({ id, name, who, words, pitch });
+export const VERTICALS = Object.freeze([
+  V('claims-firms', 'UK claims firms', 'CMCs and solicitor claims practices (PI/RTA/EL/PL/clinical)',
+    ['claims', 'cmc'],
+    'case management, claims document generation, and firm-side accounting with client escrow — on your machines, not a vendor’s'),
+  V('accountancy', 'accountancy practices', 'multi-partner accountancy and bookkeeping firms',
+    ['accountancy', 'accounting practice', 'aml', 'cdd'],
+    'practice tooling and AML/CDD client onboarding that never uploads a client record anywhere'),
+  V('insurance-brokers', 'FCA-regulated insurance brokers', 'brokerages under IDD conduct rules',
+    ['insurance broker', 'insurance brokers', 'idd', 'toba'],
+    'IDD-shaped onboarding and the TOBA / demands-and-needs paper trail, generated in-house'),
+  V('lettings', 'estate & letting agents', 'lettings and estate agencies',
+    ['letting agent', 'letting agents', 'lettings'],
+    'client onboarding that keeps tenant and landlord data inside the agency'),
+  V('adviser-firms', 'financial adviser firms', 'multi-adviser, multi-firm advice practices',
+    ['adviser', 'advisers'],
+    'multi-client adviser tooling with UK tax rules built in — client files stay in the practice'),
+]);
+
+for (const list of [BUSINESS, PERSONAL, VERTICALS]) for (const c of list) { Object.freeze(c.words); Object.freeze(c); }
 
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v)) ? v : null;
 
