@@ -4742,16 +4742,16 @@ window.addEventListener('load', () => {
     if (!el) return;
     var t = KONOMI.tier;
     var c = t==='dead'?'#8a8a8a':t==='trial'?'#c2a060':'#3a9a72';
-    el.textContent = '◊ ' + t.toUpperCase();
+    el.textContent = '◊ ' + (t==='dead'?'FREE':t.toUpperCase());
     el.style.color = c;
-    el.title = 'Konomi tier: ' + t + (KONOMI.expires_at ? ' · expires ' + KONOMI.expires_at : '');
+    el.title = 'Konomi tier: ' + (t==='dead'?'free':t) + (KONOMI.expires_at ? ' · expires ' + KONOMI.expires_at : '');
   }
   function injectBadge(){
     if (document.getElementById('konomi-badge')) return;
     var el = document.createElement('div');
     el.id = 'konomi-badge';
     el.style.cssText = 'position:fixed;bottom:12px;left:12px;background:rgba(0,0,0,.65);color:#8a8a8a;padding:5px 10px;border-radius:6px;font-family:monospace;font-size:11px;cursor:pointer;z-index:9999;letter-spacing:.06em;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(6px)';
-    el.textContent = '◊ DEAD';
+    el.textContent = '◊ FREE';
     el.onclick = function(){ showLicenceDialog(); };
     document.body.appendChild(el);
   }
