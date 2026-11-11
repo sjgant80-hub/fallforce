@@ -207,4 +207,4 @@ MIT. Use it, fork it, sell it, put it on a USB stick and hand it to your competi
 
 ---
 
-*◊·κ=1 · Sovereign software. No masters. No subscriptions. No permission needed.*
+*Sovereign software. No masters. No subscriptions. No permission needed.*
